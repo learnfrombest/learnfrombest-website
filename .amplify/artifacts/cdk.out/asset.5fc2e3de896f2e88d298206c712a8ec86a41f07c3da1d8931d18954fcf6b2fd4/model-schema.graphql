@@ -1,0 +1,6 @@
+type User @model @auth(rules: [{allow: private}])
+{
+  email: String!
+  role: String
+  createdAt: AWSDateTime
+}

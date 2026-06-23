@@ -1,0 +1,351 @@
+.supermarket-page {
+
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      135deg,
+      #052e16,
+      #065f46,
+      #0f766e
+    );
+
+  padding: 60px 40px;
+
+  font-family: Arial, sans-serif;
+
+  color: white;
+}
+
+.supermarket-overview {
+
+  max-width: 900px;
+
+  margin: 0 auto 60px auto;
+}
+
+.supermarket-overview h2 {
+
+  font-size: 48px;
+
+  font-weight: 800;
+
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.supermarket-overview .industry-tagline {
+
+  text-align: center;
+
+  font-size: 18px;
+
+  opacity: 0.7;
+
+  margin-bottom: 50px;
+}
+
+.supermarket-overview .overview-blocks {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 28px;
+
+  margin-bottom: 40px;
+}
+
+.supermarket-overview .overview-block {
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.15);
+
+  border-radius: 20px;
+
+  padding: 30px;
+}
+
+.supermarket-overview .overview-block h3 {
+
+  font-size: 14px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.6;
+
+  margin-bottom: 14px;
+}
+
+.supermarket-overview .overview-block p {
+
+  font-size: 16px;
+
+  line-height: 1.7;
+
+  opacity: 0.9;
+
+  margin: 0;
+}
+
+.supermarket-overview .solution-steps {
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.15);
+
+  border-radius: 20px;
+
+  padding: 30px;
+}
+
+.supermarket-overview .solution-steps h3 {
+
+  font-size: 14px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.6;
+
+  margin-bottom: 20px;
+}
+
+.supermarket-overview .steps-flow {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.supermarket-overview .step-pill {
+
+  background: rgba(16,185,129,0.15);
+
+  border: 1px solid rgba(16,185,129,0.35);
+
+  border-radius: 50px;
+
+  padding: 10px 20px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #6ee7b7;
+}
+
+.supermarket-overview .step-arrow {
+
+  font-size: 20px;
+
+  opacity: 0.5;
+}
+
+.supermarket-demo-title {
+
+  max-width: 900px;
+
+  margin: 0 auto 30px auto;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.5;
+
+  text-align: center;
+}
+
+.supermarket-center {
+
+  display: flex;
+
+  justify-content: center;
+}
+
+.supermarket-card {
+
+  width: 850px;
+
+  padding: 45px;
+
+  border-radius: 30px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(20px);
+
+  border:
+    1px solid rgba(255,255,255,0.15);
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.35);
+
+  color: white;
+}
+
+.supermarket-icon {
+
+  font-size: 70px;
+
+  text-align: center;
+
+  margin-bottom: 15px;
+}
+
+.supermarket-card h1 {
+
+  text-align: center;
+
+  font-size: 42px;
+
+  margin-bottom: 15px;
+}
+
+.supermarket-card p {
+
+  text-align: center;
+
+  font-size: 18px;
+
+  opacity: 0.9;
+
+  margin-bottom: 35px;
+}
+
+.upload-section {
+
+  margin-bottom: 30px;
+
+  padding: 25px;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255,255,255,0.06);
+}
+
+.upload-section h3 {
+
+  margin-bottom: 12px;
+}
+
+.upload-section input {
+
+  width: 100%;
+
+  margin-bottom: 15px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  border: none;
+}
+
+.upload-section button {
+
+  width: 100%;
+
+  border: none;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  transition: 0.3s;
+}
+
+.sales-btn {
+
+  background: #3b82f6;
+
+  color: white;
+}
+
+.products-btn {
+
+  background: #8b5cf6;
+
+  color: white;
+}
+
+.inventory-btn {
+
+  background: #f59e0b;
+
+  color: white;
+}
+
+.stores-btn {
+
+  background: #10b981;
+
+  color: white;
+}
+
+.upload-section button:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+.snowflake-btn {
+
+  width: 100%;
+
+  padding: 18px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: white;
+
+  color: #065f46;
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  margin-top: 10px;
+}
+
+.message-box {
+
+  margin-top: 25px;
+
+  padding: 18px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,0.12);
+
+  text-align: center;
+
+  font-weight: 700;
+}

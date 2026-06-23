@@ -1,0 +1,271 @@
+.fashion-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      135deg,
+      #111827,
+      #4c1d95,
+      #db2777
+    );
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 60px 40px;
+}
+
+.fashion-overview {
+  max-width: 900px;
+  margin: 0 auto 60px auto;
+}
+
+.fashion-overview h2 {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.fashion-overview .industry-tagline {
+  text-align: center;
+  font-size: 18px;
+  opacity: 0.7;
+  margin-bottom: 50px;
+}
+
+.fashion-overview .overview-blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.fashion-overview .overview-block {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.fashion-overview .overview-block h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 14px;
+}
+
+.fashion-overview .overview-block p {
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.9;
+  margin-bottom: 0;
+}
+
+.fashion-overview .solution-steps {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.fashion-overview .solution-steps h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 20px;
+}
+
+.fashion-overview .steps-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.fashion-overview .step-pill {
+  background: rgba(219,39,119,0.2);
+  border: 1px solid rgba(219,39,119,0.4);
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #f9a8d4;
+}
+
+.fashion-overview .step-arrow {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.fashion-demo-title {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.fashion-center {
+  display: flex;
+  justify-content: center;
+}
+
+.fashion-card {
+  width: 700px;
+  padding: 45px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.fashion-icon {
+  font-size: 70px;
+  margin-bottom: 15px;
+}
+
+.fashion-card h1 {
+  font-size: 42px;
+  margin-bottom: 18px;
+}
+
+.fashion-card p {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.92;
+  margin-bottom: 24px;
+}
+
+.fashion-card input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  background: white;
+  color: black;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 17px;
+  border: none;
+  border-radius: 16px;
+  background: #facc15;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.upload-btn:hover {
+  background: #fde047;
+  transform: translateY(-2px);
+}
+
+.fashion-message {
+  margin-top: 22px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.dashboard-section {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.tools-title {
+  font-size: 28px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.dashboard-text {
+  font-size: 15px;
+  margin-bottom: 22px;
+  opacity: 0.85;
+}
+
+.tools-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tools-grid button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tools-grid button:hover {
+  transform: translateY(-2px);
+}
+
+/* Dashboard */
+
+.dashboard-btn {
+  background: white;
+  color: #4c1d95;
+}
+
+.dashboard-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Chat Agent */
+
+.agent-btn {
+  background: #06b6d4;
+  color: white;
+}
+
+.agent-btn:hover {
+  background: #0891b2;
+}
+
+/* Topic */
+
+.topic-btn {
+  background: #8b5cf6;
+  color: white;
+}
+
+.topic-btn:hover {
+  background: #7c3aed;
+}
+
+/* Story */
+
+.story-btn {
+  background: #10b981;
+  color: white;
+}
+
+.story-btn:hover {
+  background: #059669;
+}
+
+/* Flow */
+
+.flow-btn {
+  background: #f97316;
+  color: white;
+}
+
+.flow-btn:hover {
+  background: #ea580c;
+}

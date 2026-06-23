@@ -1,0 +1,247 @@
+.banking-page {
+
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #312e81
+    );
+
+  color: white;
+
+  padding: 60px 40px;
+
+  font-family: Arial, sans-serif;
+}
+
+.industry-overview {
+
+  max-width: 900px;
+
+  margin: 0 auto 60px auto;
+}
+
+.industry-overview h2 {
+
+  font-size: 48px;
+
+  font-weight: 800;
+
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.industry-overview .industry-tagline {
+
+  text-align: center;
+
+  font-size: 18px;
+
+  opacity: 0.7;
+
+  margin-bottom: 50px;
+}
+
+.overview-blocks {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 28px;
+
+  margin-bottom: 40px;
+}
+
+.overview-block {
+
+  background: rgba(255,255,255,0.07);
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  border-radius: 20px;
+
+  padding: 30px;
+}
+
+.overview-block h3 {
+
+  font-size: 14px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.6;
+
+  margin-bottom: 14px;
+}
+
+.overview-block p {
+
+  font-size: 16px;
+
+  line-height: 1.7;
+
+  opacity: 0.9;
+}
+
+.solution-steps {
+
+  background: rgba(255,255,255,0.07);
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  border-radius: 20px;
+
+  padding: 30px;
+}
+
+.solution-steps h3 {
+
+  font-size: 14px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.6;
+
+  margin-bottom: 20px;
+}
+
+.steps-flow {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.step-pill {
+
+  background: rgba(255,215,59,0.15);
+
+  border: 1px solid rgba(255,215,59,0.3);
+
+  border-radius: 50px;
+
+  padding: 10px 20px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #ffd43b;
+}
+
+.step-arrow {
+
+  font-size: 20px;
+
+  opacity: 0.5;
+}
+
+.demo-section-title {
+
+  max-width: 900px;
+
+  margin: 0 auto 30px auto;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  opacity: 0.5;
+
+  text-align: center;
+}
+
+.banking-center {
+
+  display: flex;
+
+  justify-content: center;
+}
+
+.banking-card {
+
+  width: 500px;
+
+  padding: 40px;
+
+  border-radius: 24px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(20px);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.3);
+
+  text-align: center;
+}
+
+.banking-card h1 {
+
+  font-size: 42px;
+
+  margin-bottom: 20px;
+}
+
+.banking-card p {
+
+  margin-bottom: 30px;
+
+  opacity: 0.9;
+}
+
+.banking-card input {
+
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  border: none;
+
+  margin-bottom: 20px;
+}
+
+.banking-card button {
+
+  width: 100%;
+
+  padding: 16px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #ffd43b;
+
+  color: black;
+
+  font-weight: bold;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+.message {
+
+  margin-top: 20px;
+}

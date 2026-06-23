@@ -1,0 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(36px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes particleFloat {
+  0%   { transform: translateY(100vh) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+}
+
+@keyframes featuredGlow {
+  0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.18), 0 25px 70px rgba(0,0,0,0.7); }
+  50%       { box-shadow: 0 0 60px rgba(255,215,0,0.38), 0 25px 70px rgba(0,0,0,0.7); }
+}
+
+@keyframes cardGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.04), 0 20px 60px rgba(0,0,0,0.6); }
+  50%       { box-shadow: 0 0 40px rgba(255,215,0,0.1), 0 20px 60px rgba(0,0,0,0.6); }
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%       { transform: translateX(-50%) scale(1.06); }
+}
+
+@keyframes gradientText {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes borderFlow {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ROOT */
+.db-root {
+  min-height: 100vh;
+  background: #000000;
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(255,215,0,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(255,165,0,0.03) 0%, transparent 55%),
+    linear-gradient(180deg, #000000 0%, #050505 100%);
+  font-family: 'Inter', Arial, sans-serif;
+  color: white;
+  position: relative;
+  overflow-x: hidden;
+  padding: 60px 20px 80px;
+}
+
+.db-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,215,0,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,215,0,0.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+}
+
+/* PARTICLES */
+.db-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.db-particle {
+  position: absolute;
+  bottom: -20px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.45);
+  left: calc(var(--i) * 6.5%);
+  animation: particleFloat calc(9s + var(--i) * 0.6s) linear infinite;
+  animation-delay: calc(var(--i) * 0.5s);
+}
+
+.db-particle:nth-child(even) {
+  background: rgba(255, 165, 0, 0.35);
+  width: 5px;
+  height: 5px;
+}
+
+/* CONTENT */
+.db-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* HERO */
+.db-hero {
+  text-align: center;
+  margin-bottom: 64px;
+  animation: fadeInUp 0.7s ease forwards;
+}
+
+.db-hero-badge {
+  display: inline-block;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  padding: 8px 22px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.3px;
+}
+
+.db-hero-title {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.db-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FF9500 50%, #FFD700 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientText 3s linear infinite;
+}
+
+.db-hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.45);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* PRICING GRID */
+.db-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 28px;
+  align-items: stretch;
+}
+
+.db-pricing-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 48px 40px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp 0.7s ease forwards, cardGlow 4s ease-in-out infinite;
+  transition: transform 0.3s ease, border-color 0.3s;
+}
+
+.db-pricing-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.db-featured {
+  background: rgba(255, 215, 0, 0.04);
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  animation: fadeInUp 0.7s ease forwards, featuredGlow 4s ease-in-out infinite;
+}
+
+.db-featured::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.8), transparent);
+  animation: borderFlow 3s ease-in-out infinite;
+}
+
+.db-featured:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255, 215, 0, 0.45);
+}
+
+.db-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #FFD700, #FF9500);
+  color: #000000;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 20px;
+  border-radius: 50px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  animation: badgePulse 2.5s ease-in-out infinite;
+}
+
+.db-plan-name {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  letter-spacing: -0.3px;
+}
+
+.db-plan-price {
+  font-size: 60px;
+  font-weight: 900;
+  color: #FFD700;
+  margin-bottom: 30px;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.db-plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 36px;
+  flex: 1;
+}
+
+.db-plan-features li {
+  padding: 9px 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.db-check {
+  color: #25D366;
+  font-weight: 800;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+/* BUTTONS */
+.db-btn-gold {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #FFD700, #FF9500);
+  color: #000000;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  font-family: 'Inter', Arial, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.db-btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left 0.5s;
+}
+
+.db-btn-gold:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(255,215,0,0.45);
+}
+
+.db-btn-gold:hover::after { left: 100%; }
+
+.db-btn-outline {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+.db-btn-outline:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+  .db-pricing-grid { grid-template-columns: 1fr; }
+  .db-root { padding: 40px 16px 60px; }
+}
