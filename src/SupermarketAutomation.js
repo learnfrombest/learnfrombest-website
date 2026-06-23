@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./SupermarketAutomation.css";
+import NavBar from "./NavBar";
 
-function SupermarketAutomation() {
+function SupermarketAutomation({ onSignOut }) {
 
   const [salesFile, setSalesFile] = useState(null);
   const [productsFile, setProductsFile] = useState(null);
@@ -106,7 +107,9 @@ function SupermarketAutomation() {
 
     <div className="supermarket-page">
 
-      <div className="supermarket-overview">
+      <NavBar onSignOut={onSignOut} />
+
+      <div className="supermarket-overview" style={{ paddingTop: '64px' }}>
 
         <h2>🛒 Supermarket AI Analytics</h2>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ManufacturingAutomation.css";
+import NavBar from "./NavBar";
 import {
   ResponsiveContainer,
   LineChart,
@@ -16,7 +17,7 @@ import {
   Legend
 } from "recharts";
 
-function ManufacturingAutomation() {
+function ManufacturingAutomation({ onSignOut }) {
 
   const [iotData, setIotData] = useState([]);
   const [question, setQuestion] = useState("");
@@ -323,7 +324,9 @@ function ManufacturingAutomation() {
   return (
     <div className="manufacturing-page">
 
-      <div className="manufacturing-overview">
+      <NavBar onSignOut={onSignOut} />
+
+      <div className="manufacturing-overview" style={{ paddingTop: '64px' }}>
 
         <h2>🏭 Manufacturing AI</h2>
 

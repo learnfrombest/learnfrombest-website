@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './LandingPage.css';
+import ChatBot from './ChatBot';
+import LandingAnimation from './LandingAnimation';
 
 const WHATSAPP_NUMBER = '919567096415';
 const WHATSAPP_MSG = encodeURIComponent("Hi! I'm interested in AI Tutoring Academy. Can you tell me more?");
 const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/B4RT88FQ5PAL8';
 
-function LandingPage({ user, onSignIn, onSignOut, onGoToDashboard }) {
+function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) {
 
   const [visibleSections, setVisibleSections] = useState({});
   const sectionRefs = useRef({});
@@ -104,6 +106,9 @@ function LandingPage({ user, onSignIn, onSignOut, onGoToDashboard }) {
 
   return (
     <div className="lp-root">
+
+      {/* Intro animation — flies in from sky on first load */}
+      <LandingAnimation />
 
       {/* Animated background particles */}
       <div className="lp-particles" aria-hidden="true">
@@ -342,6 +347,9 @@ function LandingPage({ user, onSignIn, onSignOut, onGoToDashboard }) {
           <div className="lp-footer-copy">© 2026 AI Tutoring Academy. All rights reserved.</div>
         </div>
       </footer>
+
+      {/* CHATBOT */}
+      <ChatBot userEmail={userEmail} />
 
     </div>
   );

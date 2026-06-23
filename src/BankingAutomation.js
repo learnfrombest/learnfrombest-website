@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./BankingAutomation.css";
+import NavBar from "./NavBar";
 
-function BankingPage() {
+function BankingPage({ onSignOut }) {
 
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
@@ -80,7 +81,9 @@ function BankingPage() {
   return (
     <div className="banking-page">
 
-      <div className="industry-overview">
+      <NavBar onSignOut={onSignOut} />
+
+      <div className="industry-overview" style={{ paddingTop: '64px' }}>
 
         <h2>🏦 Banking Automation</h2>
 

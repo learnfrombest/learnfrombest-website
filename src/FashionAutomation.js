@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./FashionAutomation.css";
+import NavBar from "./NavBar";
 
-function FashionAutomation() {
+function FashionAutomation({ onSignOut }) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
@@ -93,7 +94,9 @@ function FashionAutomation() {
   return (
     <div className="fashion-page">
 
-      <div className="fashion-overview">
+      <NavBar onSignOut={onSignOut} />
+
+      <div className="fashion-overview" style={{ paddingTop: '64px' }}>
 
         <h2>👗 Fashion AI Intelligence</h2>
 

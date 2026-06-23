@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   signIn,
+  signOut,
   signUp,
   confirmSignUp,
   resetPassword,
@@ -41,6 +42,7 @@ function AuthPage({ onBack, onSignIn }) {
     }
     setLoading(true);
     try {
+      try { await signOut(); } catch (_) {}
       const { isSignedIn, nextStep } = await signIn({ username: email, password });
       if (nextStep?.signInStep === 'CONFIRM_SIGN_UP') {
         setStage('verify');
@@ -89,7 +91,7 @@ function AuthPage({ onBack, onSignIn }) {
     setLoading(true);
     try {
       await confirmSignUp({ username: email, confirmationCode: code });
-      // Auto sign in after verification
+      try { await signOut(); } catch (_) {}
       const { isSignedIn } = await signIn({ username: email, password });
       if (isSignedIn) {
         const { getCurrentUser } = await import('aws-amplify/auth');

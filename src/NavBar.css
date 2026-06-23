@@ -1,0 +1,48 @@
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: rgba(10, 10, 30, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-back-btn,
+.nav-signout-btn {
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.nav-back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-back-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(-2px);
+}
+
+.nav-signout-btn {
+  background: linear-gradient(135deg, #ff4757, #c0392b);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
+}
+
+.nav-signout-btn:hover {
+  opacity: 0.88;
+  transform: scale(1.04);
+}

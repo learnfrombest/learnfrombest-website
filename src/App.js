@@ -216,6 +216,7 @@ function App() {
   const LandingPageWrapper = () => (
     <LandingPage
       user={user}
+      userEmail={userEmail}
       onSignIn={() => setCurrentPage('auth')}
       onSignOut={handleSignOut}
       onGoToDashboard={() => navigate('/')}
@@ -253,26 +254,28 @@ function App() {
         <Routes>
         <Route
           path="/banking"
-          element={<BankingAutomation />}
+          element={user ? <BankingAutomation onSignOut={handleSignOut} /> : <LandingPageWrapper />}
         />
         <Route
           path="/fashion"
-          element={<FashionAutomation />}
+          element={user ? <FashionAutomation onSignOut={handleSignOut} /> : <LandingPageWrapper />}
         />
         <Route
           path="/supermarket"
-          element={<SupermarketAutomation />}
+          element={user ? <SupermarketAutomation onSignOut={handleSignOut} /> : <LandingPageWrapper />}
         />
         <Route
           path="/manufacturing"
-          element={<ManufacturingAutomation />}
+          element={user ? <ManufacturingAutomation onSignOut={handleSignOut} /> : <LandingPageWrapper />}
         />
-          {/* Enterprise Dashboard */}
+          {/* Enterprise Dashboard — admin sees Landing (chatbot leads), others see marketplace */}
           <Route
             path="/"
             element={
               user
-                ? <EnterpriseDashboard />
+                ? userEmail === adminEmail
+                  ? <LandingPageWrapper />
+                  : <EnterpriseDashboard onSignOut={handleSignOut} />
                 : <LandingPageWrapper />
             }
           />

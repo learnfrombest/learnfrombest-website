@@ -1,7 +1,8 @@
 import "./EnterpriseDashboard.css";
 import { useNavigate } from "react-router-dom";
+import NavBar from "./NavBar";
 
-function EnterpriseDashboard() {
+function EnterpriseDashboard({ onSignOut }) {
 
   const navigate = useNavigate();
 
@@ -38,9 +39,11 @@ function EnterpriseDashboard() {
 
     <div className="enterprise-dashboard">
 
+      <NavBar onSignOut={onSignOut} backLabel="← Home" />
+
       <div className="overlay"></div>
 
-      <div className="dashboard-content">
+      <div className="dashboard-content" style={{ paddingTop: '64px' }}>
 
         <div className="hero-section">
 
