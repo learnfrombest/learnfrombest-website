@@ -32,7 +32,7 @@ function Dashboard() {
       highlight: true,
       features: [
         'Everything in Zero to Hero',
-        '₹50K salary job guarantee',
+        '₱50K salary job guarantee',
         'Dedicated placement manager',
         'Unlimited 1:1 mentorship',
         'Live mock interviews',

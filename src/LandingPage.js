@@ -34,10 +34,10 @@ function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) 
   const features = [
     { icon: '🤖', title: 'AI-Powered Tutors', text: 'Get 1-on-1 sessions with specialised AI tutors trained on thousands of curriculum topics — available 24/7.' },
     { icon: '📊', title: 'Adaptive Learning', text: 'Our engine tracks your progress in real time and adjusts difficulty, pacing and content to keep you in the flow zone.' },
-    { icon: '🎯', title: 'Job Guarantee', text: 'Land a ₹50K+ salary job or get a full refund. Our placement team works with you until you have an offer letter.' },
+    { icon: '🎯', title: 'Job Guarantee', text: 'Land a ₱50K+ salary job or get a full refund. Our placement team works with you until you have an offer letter.' },
     { icon: '💬', title: 'Instant Feedback', text: 'Submit code, essays or assignments and receive detailed AI feedback within seconds — not days.' },
     { icon: '🌐', title: 'Industry Projects', text: 'Build real-world projects used by companies. Your portfolio will stand out in every interview.' },
-    { icon: '📱', title: 'Certificate of Completion', text: 'Earn a verified certificate recognised by top employers across India and globally.' },
+    { icon: '📱', title: 'Certificate of Completion', text: 'Earn a verified certificate recognised by top employers across the Philippines and globally.' },
   ];
 
   const plans = [
@@ -66,7 +66,7 @@ function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) 
       highlight: true,
       features: [
         'Everything in Zero to Hero',
-        '₹50K salary job guarantee',
+        '₱50K salary job guarantee',
         'Dedicated placement manager',
         'Unlimited 1:1 mentorship',
         'Live mock interviews',
@@ -81,22 +81,22 @@ function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) 
 
   const testimonials = [
     {
-      name: 'Priya Sharma',
-      role: 'Now earning ₹65K/month at TCS',
+      name: 'Maria Santos',
+      role: 'Now earning ₱65K/month at Globe Telecom',
       avatar: '👩‍💻',
       rating: 5,
-      text: 'I went from zero coding knowledge to a ₹65K job in 4 months. The job guarantee kept me motivated and the mentors were incredible.',
+      text: 'I went from zero coding knowledge to a ₱65K job in 4 months. The job guarantee kept me motivated and the mentors were incredible.',
     },
     {
-      name: 'Arjun Mehta',
-      role: 'Software Engineer at Infosys',
+      name: 'Juan dela Cruz',
+      role: 'Software Engineer at Accenture Philippines',
       avatar: '👨‍💼',
       rating: 5,
       text: 'The Job Assurance Pack paid for itself in the first week of my new salary. 100% worth every penny. Got placed in 3 months.',
     },
     {
-      name: 'Sneha Patel',
-      role: 'Data Analyst at Wipro',
+      name: 'Ana Reyes',
+      role: 'Data Analyst at BDO Unibank',
       avatar: '🧑‍🎓',
       rating: 5,
       text: 'The certificate opened doors I never thought possible. 5 interview calls in the first week after completing the course.',
@@ -173,7 +173,7 @@ function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) 
 
         {/* CENTER — main hero */}
         <div className="lp-hero">
-          <div className="lp-hero-badge">🚀 Trusted by 50,000+ learners across India</div>
+          <div className="lp-hero-badge">🚀 Trusted by 50,000+ learners across the Philippines</div>
           <h1 className="lp-hero-title">
             Land Your Dream Job with<br />
             <span className="lp-hero-highlight">AI-Powered Learning</span>
@@ -190,7 +190,7 @@ function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) 
             </a>
           </div>
           <div className="lp-hero-stats">
-            {[['50K+', 'Active Learners'], ['₹50K+', 'Avg Salary'], ['98%', 'Placement Rate'], ['24/7', 'AI Support']].map(([val, label]) => (
+            {[['50K+', 'Active Learners'], ['₱50K+', 'Avg Salary'], ['98%', 'Placement Rate'], ['24/7', 'AI Support']].map(([val, label]) => (
               <div key={label} className="lp-stat">
                 <div className="lp-stat-val">{val}</div>
                 <div className="lp-stat-label">{label}</div>
