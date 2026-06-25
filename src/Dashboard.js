@@ -1,7 +1,7 @@
 import React from "react";
 import "./Dashboard.css";
 
-const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/B4RT88FQ5PAL8';
+const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/5328GD3ZAXD24';
 const WHATSAPP_NUMBER = '919567096415';
 
 function Dashboard() {

@@ -280,6 +280,9 @@ function App() {
             }
           />
 
+          {/* Home / Landing — always accessible, shows Sign Out when logged in */}
+          <Route path="/home" element={<LandingPageWrapper />} />
+
           {/* Subscription Dashboard */}
           <Route
             path="/dashboard"

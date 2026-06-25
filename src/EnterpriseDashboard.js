@@ -39,7 +39,7 @@ function EnterpriseDashboard({ onSignOut }) {
 
     <div className="enterprise-dashboard">
 
-      <NavBar onSignOut={onSignOut} backLabel="← Home" />
+      <NavBar onSignOut={onSignOut} backLabel="← Home" backPath="/home" />
 
       <div className="overlay"></div>
 

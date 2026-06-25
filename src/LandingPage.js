@@ -5,7 +5,7 @@ import LandingAnimation from './LandingAnimation';
 
 const WHATSAPP_NUMBER = '919567096415';
 const WHATSAPP_MSG = encodeURIComponent("Hi! I'm interested in AI Tutoring Academy. Can you tell me more?");
-const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/B4RT88FQ5PAL8';
+const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/5328GD3ZAXD24';
 
 function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) {
 
