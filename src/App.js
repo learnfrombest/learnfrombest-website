@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactPixel from 'react-facebook-pixel';
 import './App.css';
 import LandingPage from './LandingPage';
 import BankingAutomation
@@ -13,7 +14,8 @@ from "./ManufacturingAutomation";
 import {
   Routes,
   Route,
-  useNavigate
+  useNavigate,
+  useLocation
 } from "react-router-dom";
 
 import AuthPage from './AuthPage';
@@ -45,6 +47,11 @@ const SUPERVISOR_NOTIFY_URL = process.env.REACT_APP_SUPERVISOR_NOTIFY_URL || '';
 function App() {
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactPixel.pageView();
+  }, [location]);
 
   const [currentPage, setCurrentPage] =
     useState('landing');
