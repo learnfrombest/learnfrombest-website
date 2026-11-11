@@ -1,3 +1,4 @@
+import ProjectStudio from './ProjectStudio';
 import React, { useState, useEffect } from 'react';
 import ReactPixel from 'react-facebook-pixel';
 import './App.css';
@@ -259,6 +260,19 @@ function App() {
       ) : (
 
         <Routes>
+	<Route
+  	path="/workspace"
+  	element={
+    	user ? (
+      	<ProjectStudio
+        onSignOut={handleSignOut}
+        currentUserEmail={userEmail}
+      	/>
+    	) : (
+      	<LandingPageWrapper />
+    	)
+  	}
+	/>
         <Route
           path="/banking"
           element={user ? <BankingAutomation onSignOut={handleSignOut} /> : <LandingPageWrapper />}
