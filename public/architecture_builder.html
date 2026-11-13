@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnFromBest | Solution Architecture Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #060913;
+      color: #f8fafc;
+    }
+    code, pre, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Subtle Dark Blueprint Grid */
+    .blueprint-grid {
+      background-color: #070b14;
+      background-image:
+        linear-gradient(to right, rgba(30, 41, 59, 0.45) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.45) 1px, transparent 1px),
+        linear-gradient(to right, rgba(51, 65, 85, 0.18) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(51, 65, 85, 0.18) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090e1a; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    /* Animated Data Flow Dashes */
+    @keyframes flowDash {
+      to {
+        stroke-dashoffset: -24;
+      }
+    }
+    .flow-line {
+      stroke-dasharray: 6 6;
+      animation: flowDash 1s linear infinite;
+    }
+
+    /* Node pop-in animation */
+    @keyframes nodePop {
+      0% { opacity: 0; transform: scale(0.92) translateY(6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .diagram-node {
+      animation: nodePop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col select-none">
+
+  <!-- ─── TOP HEADER BAR ─── -->
+  <header class="bg-slate-950 border-b border-slate-800/90 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 z-30 shrink-0">
+    
+    <!-- Left: Brand + Task ID + Presets -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2.5 pr-3 border-r border-slate-800">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-400 flex items-center justify-center font-black text-white text-base shadow-lg shadow-indigo-500/20">
+          L
+        </div>
+        <div>
+          <div class="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
+            LearnFromBest
+            <span class="text-[10px] font-mono bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded">SOLUTION ARCHITECT</span>
+          </div>
+          <div class="text-[10px] text-slate-400">Step 1 of 2 • Blueprint & Stack Designer</div>
+        </div>
+      </div>
+
+      <!-- Task ID Input -->
+      <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Task</span>
+        <input
+          id="taskIdInput"
+          type="text"
+          value="IDP-102"
+          oninput="renderDiagram()"
+          class="bg-transparent font-mono text-xs font-bold text-indigo-400 w-20 focus:outline-none uppercase"
+        />
+      </div>
+
+      <!-- Quick Starter Presets -->
+      <div class="hidden xl:flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-lg p-1">
+        <span class="text-[10px] font-bold uppercase text-slate-500 px-2">Presets:</span>
+        <button onclick="applyPreset('rag')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+          🧠 RAG GenAI Pipeline
+        </button>
+        <button onclick="applyPreset('bi')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+          📊 Serverless BI Analytics
+        </button>
+        <button onclick="applyPreset('fraud')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+          ⚡ Real-Time Fraud Detection
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Action Buttons -->
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        onclick="clearAllSelections()"
+        class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-semibold transition"
+      >
+        Clear All
+      </button>
+
+      <button
+        onclick="exportDiagramSvg()"
+        class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition flex items-center gap-1.5"
+      >
+        <span>⬇</span>
+        <span>Export Diagram (SVG)</span>
+      </button>
+
+      <button
+        onclick="proceedToLambdaStudio()"
+        class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5 active:scale-95"
+      >
+        <span>Proceed to Lambda & Code Studio</span>
+        <span>→</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── TOAST NOTIFICATION ─── -->
+  <div id="toastBanner" class="hidden fixed bottom-5 right-5 z-50 max-w-md bg-slate-900 border border-slate-700 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+    <span id="toastIcon" class="text-lg">✓</span>
+    <div class="text-xs">
+      <div id="toastTitle" class="font-bold text-white">Saved</div>
+      <div id="toastMsg" class="text-slate-400 mt-0.5"></div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN SPLIT WORKSPACE ─── -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+    <!-- LEFT PANEL: 3-TIER COMPONENT SELECTOR -->
+    <aside class="w-full lg:w-[410px] xl:w-[450px] h-1/2 lg:h-full bg-[#090e1a] border-b lg:border-b-0 lg:border-r border-slate-800 flex flex-col shrink-0">
+      
+      <!-- Panel Header & Mobile Presets -->
+      <div class="p-3.5 border-b border-slate-800/90 bg-slate-950/60 flex items-center justify-between">
+        <div>
+          <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">3-Tier Architecture Stack</h2>
+          <p class="text-[11px] text-slate-400 mt-0.5">Click tools below to assemble your live blueprint</p>
+        </div>
+        <span id="selectedCountBadge" class="text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full">
+          0 Selected
+        </span>
+      </div>
+
+      <!-- Scrollable 3 Sections -->
+      <div id="selectorContainer" class="flex-1 overflow-y-auto p-3.5 space-y-4">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </aside>
+
+    <!-- RIGHT PANEL: DYNAMIC LIVE SOLUTION DIAGRAM CANVAS + FOOTER DRAWER -->
+    <section class="flex-1 h-1/2 lg:h-full flex flex-col overflow-hidden relative blueprint-grid">
+      
+      <!-- Canvas Top Overlay Toolbar -->
+      <div class="px-5 py-3 flex flex-wrap items-center justify-between gap-2 z-10 bg-gradient-to-b from-[#070b14] via-[#070b14]/90 to-transparent pointer-events-none">
+        <div class="pointer-events-auto flex items-center gap-2.5">
+          <span class="px-2.5 py-1 rounded-md bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-slate-300 flex items-center gap-2 shadow">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>LIVE SOLUTION BLUEPRINT</span>
+          </span>
+          <span id="flowSummaryTag" class="hidden sm:inline-block text-[11px] font-mono text-slate-400 bg-slate-900/70 border border-slate-800/80 px-2.5 py-1 rounded-md">
+            Presentation → Middleware → AI & Data
+          </span>
+        </div>
+
+        <div class="pointer-events-auto flex items-center gap-2">
+          <button
+            onclick="saveDiagramAsTaskProof()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5 shadow"
+          >
+            <span>📎</span>
+            <span>Save Architecture as Task Proof</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Diagram Viewport -->
+      <div id="diagramViewport" class="flex-1 relative overflow-auto flex items-center justify-center p-4 md:p-6">
+        
+        <!-- Empty State Callout -->
+        <div id="emptyDiagramState" class="hidden text-center max-w-md p-8 rounded-2xl bg-slate-900/85 border border-slate-800 backdrop-blur-md shadow-2xl">
+          <div class="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 mx-auto flex items-center justify-center text-2xl mb-3">
+            ❖
+          </div>
+          <h3 class="text-sm font-bold text-white">Your Architecture Canvas is Empty</h3>
+          <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+            Select components from <strong class="text-cyan-400">Frontend</strong>, <strong class="text-indigo-400">Middleware</strong>, and <strong class="text-emerald-400">Backend</strong> on the left—or pick a quick starter preset above—to generate your solution diagram.
+          </p>
+        </div>
+
+        <!-- Dynamic Architecture Stage (HTML Nodes + SVG Connector Overlay) -->
+        <div id="diagramStage" class="relative w-full max-w-5xl min-w-[680px] min-h-[430px] flex items-stretch justify-between gap-8 lg:gap-14 px-2 py-4">
+          
+          <!-- SVG Connector Layer (Drawn dynamically between active nodes) -->
+          <svg id="connectorSvg" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8" />
+              </marker>
+              <marker id="arrow-emerald" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+              </marker>
+              <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#fbbf24" />
+              </marker>
+            </defs>
+            <g id="connectorLinesGroup"></g>
+          </svg>
+
+          <!-- TIER 1: PRESENTATION LAYER -->
+          <div class="flex-1 flex flex-col z-10">
+            <div class="mb-3 px-3 py-1.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-between">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-cyan-300">1. Presentation Layer</span>
+              <span id="count-frontend" class="text-[10px] font-mono text-cyan-400 font-bold">0</span>
+            </div>
+            <div id="tier-frontend" class="flex-1 flex flex-col justify-center gap-3 p-3 rounded-2xl border border-dashed border-cyan-500/20 bg-slate-950/40 backdrop-blur-[2px]">
+              <!-- Active Frontend Nodes -->
+            </div>
+          </div>
+
+          <!-- TIER 2: MIDDLEWARE & ORCHESTRATION LAYER -->
+          <div class="flex-1 flex flex-col z-10">
+            <div class="mb-3 px-3 py-1.5 rounded-lg bg-indigo-950/60 border border-indigo-500/35 flex items-center justify-between">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-300">2. Middleware & Compute</span>
+              <span id="count-middleware" class="text-[10px] font-mono text-indigo-400 font-bold">0</span>
+            </div>
+            <div id="tier-middleware" class="flex-1 flex flex-col justify-center gap-3 p-3 rounded-2xl border border-dashed border-indigo-500/25 bg-slate-950/40 backdrop-blur-[2px]">
+              <!-- Active Middleware Nodes -->
+            </div>
+          </div>
+
+          <!-- TIER 3: BACKEND, AI & DATA LAYER -->
+          <div class="flex-1 flex flex-col z-10">
+            <div class="mb-3 px-3 py-1.5 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-between">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">3. Backend, AI & Data</span>
+              <span id="count-backend" class="text-[10px] font-mono text-emerald-400 font-bold">0</span>
+            </div>
+            <div id="tier-backend" class="flex-1 flex flex-col justify-center gap-3 p-3 rounded-2xl border border-dashed border-emerald-500/20 bg-slate-950/40 backdrop-blur-[2px]">
+              <!-- Active Backend Nodes -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTTOM COLLAPSIBLE DRAWER: IAM POLICY & GENERATED BOILERPLATE PREVIEW -->
+      <div class="bg-slate-950/95 border-t border-slate-800 z-20 shrink-0">
+        <div class="px-5 py-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-900/60 transition" onclick="toggleBottomDrawer()">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <span class="text-amber-400">🔐</span>
+              <span>Architecture Summary, Scoped IAM Policy & Python Starter Preview</span>
+            </span>
+            <span id="iamActionCount" class="text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded">
+              0 IAM Permissions
+            </span>
+          </div>
+          <button id="drawerToggleBtn" class="text-xs font-mono text-slate-400 hover:text-white">
+            ▲ Expand Details
+          </button>
+        </div>
+
+        <div id="bottomDrawerBody" class="hidden px-5 pb-4 pt-1 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-56 overflow-y-auto select-text">
+          <!-- Auto-generated IAM Policy -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Auto-Generated Least-Privilege IAM Policy</span>
+              <button onclick="copyText('iamPolicyPre', 'IAM Policy copied!')" class="text-[10px] text-indigo-400 hover:underline">Copy JSON</button>
+            </div>
+            <pre id="iamPolicyPre" class="bg-[#060913] border border-slate-800 rounded-lg p-2.5 text-[11px] font-mono text-amber-200/90 overflow-x-auto h-36"></pre>
+          </div>
+
+          <!-- Auto-generated Python Lambda Boilerplate Preview -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Generated Python Boto3 Starter Boilerplate</span>
+              <button onclick="proceedToLambdaStudio()" class="text-[10px] text-emerald-400 hover:underline font-bold">Open in Lambda Studio →</button>
+            </div>
+            <pre id="pythonPreviewPre" class="bg-[#060913] border border-slate-800 rounded-lg p-2.5 text-[11px] font-mono text-sky-300 overflow-x-auto h-36"></pre>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ─── MODAL: CODE HANDOFF MODAL (When opened standalone without parent router) ─── -->
+  <div id="handoffModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[88vh]">
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-indigo-400 font-bold">🚀</span>
+          <h3 class="text-sm font-bold text-white">Architecture Stack Ready for Python & Lambda Studio</h3>
+        </div>
+        <button onclick="closeHandoffModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4 select-text">
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Your architecture blueprint and custom <code class="text-sky-400">lambda_function.py</code> starter code have been saved to workspace storage (<code class="text-indigo-300">lfb_selected_architecture</code>). Copy the tailored code below or launch <code class="text-emerald-300">lambda_studio.html</code> directly:
+        </p>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-mono font-bold text-sky-400">Generated lambda_function.py</span>
+          <button onclick="copyText('handoffCodeBlock', 'Python Lambda code copied!')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg">
+            Copy Python Code
+          </button>
+        </div>
+        <pre id="handoffCodeBlock" class="bg-[#060913] border border-slate-800 rounded-xl p-4 text-xs font-mono text-emerald-300 overflow-x-auto max-h-72 leading-relaxed"></pre>
+      </div>
+      <div class="px-5 py-3 bg-slate-950 border-t border-slate-800 flex justify-end gap-2">
+        <button onclick="closeHandoffModal()" class="px-4 py-1.5 rounded-lg border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-800">
+          Back to Diagram
+        </button>
+        <a id="launchStudioLink" href="lambda_studio.html" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow">
+          Open lambda_studio.html →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ARCHITECTURE CATALOG & ENGINE ─── -->
+  <script>
+    const ARCHITECTURE_CATALOG = {
+      frontend: {
+        title: "Frontend & Presentation",
+        subtitle: "Dashboards, portals & client interfaces",
+        accent: "cyan",
+        badgeClass: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+        activeCardClass: "border-cyan-400 bg-cyan-950/40 shadow-lg shadow-cyan-500/10",
+        flowLabel: "HTTPS / REST",
+        tools: [
+          {
+            id: "powerbi",
+            name: "Power BI",
+            role: "Executive BI & DAX Visual Analytics",
+            protocol: "DirectQuery / REST",
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="12" width="3" height="8" rx="1" fill="currentColor"/><rect x="10.5" y="8" width="3" height="12" rx="1" fill="currentColor"/><rect x="17" y="4" width="3" height="16" rx="1" fill="currentColor"/></svg>`
+          },
+          {
+            id: "quicksight",
+            name: "Amazon QuickSight",
+            role: "Embedded Serverless AWS Dashboards",
+            protocol: "SPICE / Embed SDK",
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l5.5 3.5"/></svg>`
+          },
+          {
+            id: "react",
+            name: "React Web App",
+            role: "LearnFromBest Interactive Portal",
+            protocol: "HTTPS / JSON",
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><ellipse cx="12" cy="12" rx="9" ry="3.8"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"/></svg>`
+          },
+          {
+            id: "streamlit",
+            name: "Streamlit UI",
+            role: "Rapid Python Data & GenAI App",
+            protocol: "WebSocket / HTTP",
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l8-11 8 11H4z"/></svg>`
+          },
+          {
+            id: "mobile",
+            name: "Mobile App",
+            role: "iOS / Android Field Client",
+            protocol: "GraphQL / REST",
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>`
+          }
+        ]
+      },
+
+      middleware: {
+        title: "Middleware & Orchestration",
+        subtitle: "Compute, routing & event-driven pipelines",
+        accent: "indigo",
+        badgeClass: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30",
+        activeCardClass: "border-indigo-400 bg-indigo-950/45 shadow-lg shadow-indigo-500/15",
+        flowLabel: "Boto3 SDK / SQL",
+        tools: [
+          {
+            id: "lambda",
+            name: "AWS Lambda",
+            role: "Serverless Python 3.12 Compute Engine",
+            protocol: "Invoke / Boto3",
+            iam: ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 20L11.5 7M9 4h3l6 16h-2.5l-2.3-6.2"/></svg>`
+          },
+          {
+            id: "apigateway",
+            name: "API Gateway",
+            role: "REST / WebSocket Edge Routing & Auth",
+            protocol: "Proxy Integration",
+            iam: ["execute-api:Invoke"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M15 7l5 5-5 5M4 6v12"/></svg>`
+          },
+          {
+            id: "stepfunctions",
+            name: "Step Functions",
+            role: "Multi-Step Visual Workflow State Machine",
+            protocol: "ASL Orchestration",
+            iam: ["states:StartExecution", "states:DescribeExecution"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="6" height="4" rx="1"/><rect x="15" y="10" width="6" height="4" rx="1"/><rect x="3" y="16" width="6" height="4" rx="1"/><path d="M9 6h3v6h3M12 12v6H9"/></svg>`
+          },
+          {
+            id: "eventbridge",
+            name: "EventBridge",
+            role: "Serverless Event Bus & Scheduled Rules",
+            protocol: "Pub/Sub Events",
+            iam: ["events:PutEvents"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></svg>`
+          },
+          {
+            id: "sqs",
+            name: "Amazon SQS",
+            role: "Decoupled Message Buffering Queue",
+            protocol: "Batch Poll",
+            iam: ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 6v12M13 6v12M17 10l2 2-2 2"/></svg>`
+          }
+        ]
+      },
+
+      backend: {
+        title: "Backend, AI & Data",
+        subtitle: "Foundation models, analytics & storage",
+        accent: "emerald",
+        badgeClass: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+        activeCardClass: "border-emerald-400 bg-emerald-950/40 shadow-lg shadow-emerald-500/15",
+        flowLabel: "Storage / Inference",
+        tools: [
+          {
+            id: "bedrock",
+            name: "Amazon Bedrock",
+            role: "Claude 3.5 Sonnet & Titan GenAI Models",
+            protocol: "InvokeModel API",
+            iam: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>`
+          },
+          {
+            id: "athena",
+            name: "Amazon Athena",
+            role: "Serverless Interactive S3 SQL Queries",
+            protocol: "Presto / SQL",
+            iam: ["athena:StartQueryExecution", "athena:GetQueryResults", "glue:GetTable"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`
+          },
+          {
+            id: "s3",
+            name: "Amazon S3",
+            role: "Object Data Lake & Proof Artifact Vault",
+            protocol: "PutObject / GetObject",
+            iam: ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7l7-3 7 3v10l-7 3-7-3V7z"/><path d="M5 7l7 3 7-3"/></svg>`
+          },
+          {
+            id: "dynamodb",
+            name: "Amazon DynamoDB",
+            role: "Single-Digit ms NoSQL Operational Store",
+            protocol: "PutItem / Query",
+            iam: ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Query", "dynamodb:UpdateItem"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><circle cx="8" cy="7" r="1" fill="currentColor"/><circle cx="8" cy="17" r="1" fill="currentColor"/></svg>`
+          },
+          {
+            id: "opensearch",
+            name: "OpenSearch Vector DB",
+            role: "Semantic RAG Embeddings Retrieval",
+            protocol: "k-NN Vector Search",
+            iam: ["aoss:APIAccessAll"],
+            svg: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.35-4.35"/><path d="M8 11h6M11 8v6"/></svg>`
+          }
+        ]
+      }
+    };
+
+    const PRESETS = {
+      rag: {
+        name: "RAG GenAI Pipeline",
+        frontend: ["react"],
+        middleware: ["apigateway", "lambda"],
+        backend: ["bedrock", "opensearch", "s3"]
+      },
+      bi: {
+        name: "Serverless BI Analytics",
+        frontend: ["powerbi", "quicksight"],
+        middleware: ["lambda"],
+        backend: ["athena", "s3"]
+      },
+      fraud: {
+        name: "Real-Time Fraud Detection",
+        frontend: ["react", "mobile"],
+        middleware: ["apigateway", "lambda", "eventbridge"],
+        backend: ["dynamodb", "bedrock"]
+      }
+    };
+
+    // Active Selected State
+    let selectedState = {
+      frontend: new Set(["powerbi"]),
+      middleware: new Set(["lambda", "eventbridge"]),
+      backend: new Set(["bedrock", "athena"])
+    };
+
+    // Custom Directional Flows (supports intra-layer & cross-layer links)
+    let customFlows = [
+      {
+        id: "flow-default-eb-lambda",
+        fromTier: "middleware",
+        fromId: "eventbridge",
+        toTier: "middleware",
+        toId: "lambda",
+        label: "Scheduled / Event Rule"
+      }
+    ];
+
+    // Direct Canvas Click-to-Link State
+    let pendingLinkSource = null;
+
+    let drawerExpanded = false;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlTaskId = params.get("taskId");
+      if (urlTaskId) {
+        document.getElementById("taskIdInput").value = urlTaskId.toUpperCase();
+      }
+      renderSelectorPanel();
+      renderDiagram();
+    });
+
+    window.addEventListener("resize", () => {
+      drawConnectors();
+    });
+
+    function getAllActiveNodesList() {
+      const list = [];
+      ["frontend", "middleware", "backend"].forEach(tierKey => {
+        selectedState[tierKey].forEach(toolId => {
+          const tool = ARCHITECTURE_CATALOG[tierKey].tools.find(t => t.id === toolId);
+          if (tool) {
+            list.push({
+              compositeId: `${tierKey}:${toolId}`,
+              tierKey,
+              toolId,
+              name: tool.name,
+              tierTitle: ARCHITECTURE_CATALOG[tierKey].title
+            });
+          }
+        });
+      });
+      return list;
+    }
+
+    function pruneInvalidCustomFlows() {
+      customFlows = customFlows.filter(f =>
+        selectedState[f.fromTier]?.has(f.fromId) &&
+        selectedState[f.toTier]?.has(f.toId)
+      );
+      if (pendingLinkSource && !selectedState[pendingLinkSource.tierKey]?.has(pendingLinkSource.toolId)) {
+        pendingLinkSource = null;
+      }
+    }
+
+    // Render Left 3-Tier Component Selector + Custom Flows Builder
+    function renderSelectorPanel() {
+      const container = document.getElementById("selectorContainer");
+      const activeNodes = getAllActiveNodesList();
+      let html = "";
+
+      // Interactive Custom Flows / Link Nodes Section
+      const optionsHtml = activeNodes.map(n =>
+        `<option value="${n.compositeId}">${n.name} (${n.tierKey})</option>`
+      ).join("");
+
+      const defaultToOption = activeNodes.length > 1 ? activeNodes[1].compositeId : (activeNodes[0]?.compositeId || "");
+
+      html += `
+        <div class="rounded-2xl border border-amber-500/35 bg-gradient-to-b from-amber-950/20 to-slate-900/60 overflow-hidden shadow-lg">
+          <div class="px-3.5 py-2.5 bg-slate-900/95 border-b border-slate-800/90 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <span>🔗</span>
+                <span>Custom Flows / Link Nodes</span>
+              </div>
+              <div class="text-[10px] text-slate-400">Connect any two tools (e.g. EventBridge → Lambda)</div>
+            </div>
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-amber-500/15 text-amber-300 border-amber-500/30">
+              ${customFlows.length} custom
+            </span>
+          </div>
+
+          <div class="p-3 space-y-2.5">
+            ${activeNodes.length >= 2 ? `
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">From (Source)</label>
+                  <select id="flowFromSelect" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg px-2 py-1.5 text-[11px] text-slate-200 focus:outline-none">
+                    ${optionsHtml}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">To (Target)</label>
+                  <select id="flowToSelect" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg px-2 py-1.5 text-[11px] text-slate-200 focus:outline-none">
+                    ${activeNodes.map(n =>
+                      `<option value="${n.compositeId}" ${n.compositeId === defaultToOption ? "selected" : ""}>${n.name} (${n.tierKey})</option>`
+                    ).join("")}
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input
+                  id="flowLabelInput"
+                  type="text"
+                  value="Event Rule Trigger"
+                  list="flowPresetsList"
+                  placeholder="Trigger / Protocol label..."
+                  class="flex-1 bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-amber-200 focus:outline-none"
+                />
+                <datalist id="flowPresetsList">
+                  <option value="Scheduled / Event Rule">
+                  <option value="Async Invoke">
+                  <option value="Poll Batch">
+                  <option value="REST Proxy">
+                  <option value="State Transition">
+                </datalist>
+                <button
+                  type="button"
+                  onclick="addCustomFlowFromForm()"
+                  class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] transition shrink-0 shadow"
+                >
+                  ＋ Add Flow
+                </button>
+              </div>
+            ` : `
+              <div class="text-[11px] text-slate-400 italic py-1">
+                Select at least 2 tools below to create custom flows.
+              </div>
+            `}
+
+            <!-- Active Custom Flows List -->
+            ${customFlows.length > 0 ? `
+              <div class="pt-1.5 border-t border-slate-800/80 space-y-1.5 max-h-32 overflow-y-auto">
+                ${customFlows.map(flow => {
+                  const srcTool = ARCHITECTURE_CATALOG[flow.fromTier]?.tools.find(t => t.id === flow.fromId);
+                  const tgtTool = ARCHITECTURE_CATALOG[flow.toTier]?.tools.find(t => t.id === flow.toId);
+                  return `
+                    <div class="flex items-center justify-between gap-2 bg-slate-950/90 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px]">
+                      <div class="min-w-0 flex items-center gap-1.5 truncate">
+                        <span class="font-bold text-slate-200 truncate">${srcTool?.name || flow.fromId}</span>
+                        <span class="text-amber-400 font-mono">→</span>
+                        <span class="font-bold text-slate-200 truncate">${tgtTool?.name || flow.toId}</span>
+                        <span class="text-[9px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded truncate">${flow.label}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onclick="removeCustomFlow('${flow.id}')"
+                        title="Remove flow"
+                        class="text-slate-500 hover:text-rose-400 font-bold text-xs px-1 transition shrink-0"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+
+      Object.entries(ARCHITECTURE_CATALOG).forEach(([tierKey, tier]) => {
+        const activeCount = selectedState[tierKey].size;
+
+        html += `
+          <div class="rounded-2xl border border-slate-800/90 bg-slate-900/40 overflow-hidden">
+            <div class="px-3.5 py-2.5 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-white flex items-center gap-2">
+                  <span>${tier.title}</span>
+                </div>
+                <div class="text-[10px] text-slate-400">${tier.subtitle}</div>
+              </div>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${tier.badgeClass}">
+                ${activeCount} active
+              </span>
+            </div>
+
+            <div class="p-2.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+              ${tier.tools.map(tool => {
+                const isSelected = selectedState[tierKey].has(tool.id);
+                return `
+                  <button
+                    type="button"
+                    onclick="toggleTool('${tierKey}', '${tool.id}')"
+                    class="w-full text-left p-2.5 rounded-xl border transition-all duration-150 flex items-center justify-between gap-2.5 group ${
+                      isSelected
+                        ? tier.activeCardClass
+                        : "border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900/80"
+                    }"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition ${
+                        isSelected
+                          ? `bg-${tier.accent}-500/20 text-${tier.accent}-300 border border-${tier.accent}-400/40`
+                          : "bg-slate-900 text-slate-400 border border-slate-800 group-hover:text-slate-200"
+                      }">
+                        ${tool.svg}
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-xs font-bold ${isSelected ? "text-white" : "text-slate-200"} truncate">
+                          ${tool.name}
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate">
+                          ${tool.role}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold shrink-0 border transition ${
+                      isSelected
+                        ? `bg-${tier.accent}-500 text-slate-950 border-${tier.accent}-400`
+                        : "border-slate-700 text-transparent group-hover:border-slate-500"
+                    }">
+                      ✓
+                    </div>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const totalSelected =
+        selectedState.frontend.size +
+        selectedState.middleware.size +
+        selectedState.backend.size;
+      document.getElementById("selectedCountBadge").textContent = `${totalSelected} Selected`;
+    }
+
+    function toggleTool(tierKey, toolId) {
+      if (selectedState[tierKey].has(toolId)) {
+        selectedState[tierKey].delete(toolId);
+      } else {
+        selectedState[tierKey].add(toolId);
+      }
+      pruneInvalidCustomFlows();
+      renderSelectorPanel();
+      renderDiagram();
+    }
+
+    function addCustomFlow(fromTier, fromId, toTier, toId, label) {
+      if (fromTier === toTier && fromId === toId) {
+        showToast("Invalid Connection", "Source and target nodes must be different.", "⚠️");
+        return;
+      }
+
+      const cleanLabel = (label || "Custom Flow").trim();
+      const existingIdx = customFlows.findIndex(
+        f => f.fromTier === fromTier && f.fromId === fromId && f.toTier === toTier && f.toId === toId
+      );
+
+      if (existingIdx !== -1) {
+        customFlows[existingIdx].label = cleanLabel;
+      } else {
+        customFlows.push({
+          id: "flow-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
+          fromTier,
+          fromId,
+          toTier,
+          toId,
+          label: cleanLabel
+        });
+      }
+
+      renderSelectorPanel();
+      renderDiagram();
+      const srcName = ARCHITECTURE_CATALOG[fromTier]?.tools.find(t => t.id === fromId)?.name || fromId;
+      const tgtName = ARCHITECTURE_CATALOG[toTier]?.tools.find(t => t.id === toId)?.name || toId;
+      showToast("Flow Connected", `${srcName} → ${tgtName} (${cleanLabel})`, "🔗");
+    }
+
+    function addCustomFlowFromForm() {
+      const fromVal = document.getElementById("flowFromSelect")?.value;
+      const toVal = document.getElementById("flowToSelect")?.value;
+      const labelVal = document.getElementById("flowLabelInput")?.value;
+      if (!fromVal || !toVal) return;
+
+      const [fromTier, fromId] = fromVal.split(":");
+      const [toTier, toId] = toVal.split(":");
+      addCustomFlow(fromTier, fromId, toTier, toId, labelVal);
+    }
+
+    function removeCustomFlow(flowId) {
+      customFlows = customFlows.filter(f => f.id !== flowId);
+      renderSelectorPanel();
+      renderDiagram();
+    }
+
+    function handleNodeLinkClick(event, tierKey, toolId) {
+      event.stopPropagation();
+      if (!pendingLinkSource) {
+        pendingLinkSource = { tierKey, toolId };
+        const toolName = ARCHITECTURE_CATALOG[tierKey]?.tools.find(t => t.id === toolId)?.name || toolId;
+        showToast("Select Target Node", `Click the Link icon on any destination card to connect from ${toolName}.`, "🔗");
+        renderDiagram();
+        return;
+      }
+
+      if (pendingLinkSource.tierKey === tierKey && pendingLinkSource.toolId === toolId) {
+        pendingLinkSource = null;
+        renderDiagram();
+        return;
+      }
+
+      const src = pendingLinkSource;
+      pendingLinkSource = null;
+      const defaultLabel = src.fromId === "eventbridge" || src.toolId === "eventbridge"
+        ? "Scheduled / Event Rule"
+        : src.toolId === "sqs"
+        ? "Poll Batch"
+        : "Async Invoke";
+
+      addCustomFlow(src.tierKey, src.toolId, tierKey, toolId, defaultLabel);
+    }
+
+    function applyPreset(presetKey) {
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+      selectedState.frontend = new Set(preset.frontend);
+      selectedState.middleware = new Set(preset.middleware);
+      selectedState.backend = new Set(preset.backend);
+      pendingLinkSource = null;
+      customFlows = [];
+
+      if (presetKey === "fraud") {
+        customFlows.push({
+          id: "flow-preset-fraud",
+          fromTier: "middleware",
+          fromId: "eventbridge",
+          toTier: "middleware",
+          toId: "lambda",
+          label: "Event Rule Trigger"
+        });
+      }
+
+      renderSelectorPanel();
+      renderDiagram();
+      showToast(`Loaded "${preset.name}"`, "Architecture diagram and IAM policy updated.", "✨");
+    }
+
+    function clearAllSelections() {
+      selectedState.frontend.clear();
+      selectedState.middleware.clear();
+      selectedState.backend.clear();
+      customFlows = [];
+      pendingLinkSource = null;
+      renderSelectorPanel();
+      renderDiagram();
+    }
+
+    function applyPreset(presetKey) {
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+      selectedState.frontend = new Set(preset.frontend);
+      selectedState.middleware = new Set(preset.middleware);
+      selectedState.backend = new Set(preset.backend);
+      renderSelectorPanel();
+      renderDiagram();
+      showToast(`Loaded "${preset.name}"`, "Architecture diagram and IAM policy updated.", "✨");
+    }
+
+    function clearAllSelections() {
+      selectedState.frontend.clear();
+      selectedState.middleware.clear();
+      selectedState.backend.clear();
+      renderSelectorPanel();
+      renderDiagram();
+    }
+
+    // Render Right Dynamic Solution Diagram
+    function renderDiagram() {
+      const totalSelected =
+        selectedState.frontend.size +
+        selectedState.middleware.size +
+        selectedState.backend.size;
+
+      const emptyState = document.getElementById("emptyDiagramState");
+      const stage = document.getElementById("diagramStage");
+
+      if (totalSelected === 0) {
+        emptyState.classList.remove("hidden");
+        stage.classList.add("hidden");
+        updateIamAndCodePreview();
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      stage.classList.remove("hidden");
+
+      ["frontend", "middleware", "backend"].forEach(tierKey => {
+        const tierCatalog = ARCHITECTURE_CATALOG[tierKey];
+        const tierContainer = document.getElementById(`tier-${tierKey}`);
+        const countBadge = document.getElementById(`count-${tierKey}`);
+        const activeIds = Array.from(selectedState[tierKey]);
+
+        countBadge.textContent = activeIds.length;
+
+        if (activeIds.length === 0) {
+          tierContainer.innerHTML = `
+            <div class="text-center py-6 px-3 text-[11px] text-slate-500 italic">
+              No ${tierKey} tools selected
+            </div>
+          `;
+          return;
+        }
+
+        tierContainer.innerHTML = activeIds.map(id => {
+          const tool = tierCatalog.tools.find(t => t.id === id);
+          if (!tool) return "";
+
+          const borderAccent =
+            tierKey === "frontend"
+              ? "border-cyan-500/40 shadow-cyan-500/10"
+              : tierKey === "middleware"
+              ? "border-indigo-500/45 shadow-indigo-500/15"
+              : "border-emerald-500/40 shadow-emerald-500/10";
+
+          const isLinkSource =
+            pendingLinkSource &&
+            pendingLinkSource.tierKey === tierKey &&
+            pendingLinkSource.toolId === tool.id;
+
+          const activeCardBorder = isLinkSource
+            ? "border-amber-400 ring-2 ring-amber-400/40 shadow-amber-500/20"
+            : pendingLinkSource
+            ? `${borderAccent} hover:border-amber-400 cursor-crosshair`
+            : borderAccent;
+
+          const iconBg =
+            tierKey === "frontend"
+              ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/30"
+              : tierKey === "middleware"
+              ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
+              : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
+
+          const pillColor =
+            tierKey === "frontend"
+              ? "text-cyan-300 bg-cyan-950/80 border-cyan-800/70"
+              : tierKey === "middleware"
+              ? "text-indigo-300 bg-indigo-950/80 border-indigo-800/70"
+              : "text-emerald-300 bg-emerald-950/80 border-emerald-800/70";
+
+          return `
+            <div
+              id="node-${tierKey}-${tool.id}"
+              data-tier="${tierKey}"
+              data-tool="${tool.id}"
+              onclick="${pendingLinkSource ? `handleNodeLinkClick(event, '${tierKey}', '${tool.id}')` : ""}"
+              class="diagram-node relative bg-slate-900/95 border ${activeCardBorder} rounded-xl p-3 shadow-xl backdrop-blur-md flex items-center justify-between gap-2.5 group transition"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-9 h-9 rounded-lg border ${iconBg} flex items-center justify-center shrink-0">
+                  ${tool.svg}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-extrabold text-white truncate">${tool.name}</div>
+                  <div class="text-[10px] text-slate-400 truncate">${tool.role}</div>
+                  <span class="inline-block mt-1 text-[9px] font-mono px-1.5 py-0.2 rounded border ${pillColor}">
+                    ${tool.protocol}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onclick="handleNodeLinkClick(event, '${tierKey}', '${tool.id}')"
+                  title="${isLinkSource ? "Cancel link" : pendingLinkSource ? "Connect flow to this node" : "Connect flow from this node"}"
+                  class="px-1.5 py-1 rounded-md text-[10px] font-mono font-bold border transition ${
+                    isLinkSource
+                      ? "bg-amber-500 text-slate-950 border-amber-400 opacity-100"
+                      : pendingLinkSource
+                      ? "bg-amber-500/20 text-amber-300 border-amber-400/50 opacity-100"
+                      : "opacity-0 group-hover:opacity-100 bg-slate-800/90 text-amber-300 border-slate-700 hover:border-amber-400"
+                  }"
+                >
+                  🔗
+                </button>
+                <button
+                  type="button"
+                  onclick="event.stopPropagation(); toggleTool('${tierKey}', '${tool.id}')"
+                  title="Remove from diagram"
+                  class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 text-xs p-1 transition"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      });
+
+      updateIamAndCodePreview();
+      requestAnimationFrame(() => drawConnectors());
+    }
+
+    // Draw Animated SVG Bezier Connectors Between Active Tiers + Custom Intra/Cross Flows
+    function drawConnectors() {
+      const stage = document.getElementById("diagramStage");
+      const linesGroup = document.getElementById("connectorLinesGroup");
+      if (!stage || stage.classList.contains("hidden")) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      const feNodes = Array.from(document.querySelectorAll('[data-tier="frontend"]'));
+      const mwNodes = Array.from(document.querySelectorAll('[data-tier="middleware"]'));
+      const beNodes = Array.from(document.querySelectorAll('[data-tier="backend"]'));
+
+      let svgMarkup = "";
+
+      function renderPillLabel(midX, midY, strokeColor, labelText) {
+        if (!labelText) return "";
+        const pillW = labelText.length * 5.8 + 14;
+        return `
+          <rect x="${midX - pillW / 2}" y="${midY - 8}" width="${pillW}" height="16" rx="4" fill="#090e1a" stroke="${strokeColor}" stroke-opacity="0.55" stroke-width="1" />
+          <text x="${midX}" y="${midY + 3}" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600">${labelText}</text>
+        `;
+      }
+
+      function connectNodes(sourceEl, targetEl, strokeColor, markerId, labelText, showLabel, customOffsetIdx = 0) {
+        const sRect = sourceEl.getBoundingClientRect();
+        const tRect = targetEl.getBoundingClientRect();
+        const sTier = sourceEl.getAttribute("data-tier");
+        const tTier = targetEl.getAttribute("data-tier");
+
+        // Intra-Column (Same-Tier Vertical Arc along right margin so card text stays clear)
+        if (sTier === tTier) {
+          const x1 = sRect.right - stageRect.left - 2;
+          const y1 = sRect.top + sRect.height / 2 - stageRect.top;
+          const x2 = tRect.right - stageRect.left + 4;
+          const y2 = tRect.top + tRect.height / 2 - stageRect.top;
+
+          const arcOutward = 44 + customOffsetIdx * 18;
+          const ctrlX = Math.max(x1, x2) + arcOutward;
+          const pathData = `M ${x1} ${y1} C ${ctrlX} ${y1}, ${ctrlX} ${y2}, ${x2} ${y2}`;
+
+          svgMarkup += `
+            <path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-opacity="0.24" stroke-width="3.2" />
+            <path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="1.85" class="flow-line" marker-end="url(#${markerId})" />
+          `;
+
+          if (showLabel && labelText) {
+            const peakX = Math.max(x1, x2) + arcOutward * 0.76;
+            const midY = (y1 + y2) / 2;
+            svgMarkup += renderPillLabel(peakX, midY, strokeColor, labelText);
+          }
+          return;
+        }
+
+        // Cross-Column Horizontal Bezier Curve
+        const isLeftToRight = sRect.left < tRect.left;
+        const x1 = isLeftToRight ? sRect.right - stageRect.left : sRect.left - stageRect.left;
+        const y1 = sRect.top + sRect.height / 2 - stageRect.top;
+        const x2 = isLeftToRight ? tRect.left - stageRect.left - 4 : tRect.right - stageRect.left + 4;
+        const y2 = tRect.top + tRect.height / 2 - stageRect.top;
+
+        const dx = Math.abs(x2 - x1) * 0.5;
+        const c1x = isLeftToRight ? x1 + dx : x1 - dx;
+        const c2x = isLeftToRight ? x2 - dx : x2 + dx;
+        const pathData = `M ${x1} ${y1} C ${c1x} ${y1}, ${c2x} ${y2}, ${x2} ${y2}`;
+
+        svgMarkup += `
+          <path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-opacity="0.22" stroke-width="3" />
+          <path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="1.75" class="flow-line" marker-end="url(#${markerId})" />
+        `;
+
+        if (showLabel && labelText) {
+          const midX = (x1 + x2) / 2;
+          const midY = (y1 + y2) / 2 - 8 - customOffsetIdx * 16;
+          svgMarkup += renderPillLabel(midX, midY, strokeColor, labelText);
+        }
+      }
+
+      // 1. Default Cross-Layer Flows (Frontend -> Middleware -> Backend)
+      if (feNodes.length > 0 && mwNodes.length > 0) {
+        feNodes.forEach((fe, i) => {
+          mwNodes.forEach((mw, j) => {
+            const showLabel = i === 0 && j === Math.floor(mwNodes.length / 2);
+            connectNodes(fe, mw, "#38bdf8", "arrow-cyan", "HTTPS / REST", showLabel);
+          });
+        });
+      }
+
+      if (mwNodes.length > 0 && beNodes.length > 0) {
+        mwNodes.forEach((mw, i) => {
+          beNodes.forEach((be, j) => {
+            const showLabel = i === Math.floor(mwNodes.length / 2) && j === 0;
+            const label = selectedState.backend.has("athena") && selectedState.backend.size === 1
+              ? "SQL / Query"
+              : "Boto3 SDK";
+            connectNodes(mw, be, "#34d399", "arrow-emerald", label, showLabel);
+          });
+        });
+      }
+
+      // Direct Frontend -> Backend if no Middleware selected
+      if (feNodes.length > 0 && mwNodes.length === 0 && beNodes.length > 0) {
+        feNodes.forEach((fe, i) => {
+          beNodes.forEach((be, j) => {
+            const showLabel = i === 0 && j === 0;
+            connectNodes(fe, be, "#38bdf8", "arrow-cyan", "Direct Query", showLabel);
+          });
+        });
+      }
+
+      // 2. Custom User-Defined Flows (including intra-column EventBridge -> Lambda)
+      customFlows.forEach((flow, idx) => {
+        const srcEl = document.getElementById(`node-${flow.fromTier}-${flow.fromId}`);
+        const tgtEl = document.getElementById(`node-${flow.toTier}-${flow.toId}`);
+        if (srcEl && tgtEl) {
+          connectNodes(srcEl, tgtEl, "#fbbf24", "arrow-amber", flow.label, true, idx);
+        }
+      });
+
+      linesGroup.innerHTML = svgMarkup;
+    }
+
+    // Build Scoped IAM Policy & Tailored Python Lambda Code
+    function generateIamPolicyObject() {
+      const actions = new Set(["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]);
+
+      ["middleware", "backend"].forEach(tierKey => {
+        selectedState[tierKey].forEach(id => {
+          const tool = ARCHITECTURE_CATALOG[tierKey].tools.find(t => t.id === id);
+          if (tool && tool.iam) {
+            tool.iam.forEach(perm => actions.add(perm));
+          }
+        });
+      });
+
+      return {
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "LearnFromBestScopedTaskExecution",
+            Effect: "Allow",
+            Action: Array.from(actions),
+            Resource: "*"
+          }
+        ]
+      };
+    }
+
+    function generateTailoredPythonCode() {
+      const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
+      const hasBedrock = selectedState.backend.has("bedrock");
+      const hasAthena = selectedState.backend.has("athena");
+      const hasS3 = selectedState.backend.has("s3");
+      const hasDynamo = selectedState.backend.has("dynamodb");
+      const hasOpenSearch = selectedState.backend.has("opensearch");
+
+      const imports = ["import json", "import datetime", "import boto3"];
+      const clients = [];
+      const steps = [];
+
+      if (hasBedrock) {
+        clients.push('bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")');
+        steps.push(`    # 1. Invoke Amazon Bedrock (Claude 3.5 Sonnet)
+    prompt = event.get("prompt", "Analyze enterprise workflow payload for task ${taskId}.")
+    bedrock_resp = bedrock.invoke_model(
+        modelId="anthropic.claude-3-5-sonnet-20240620-v1:0",
+        body=json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 512,
+            "messages": [{"role": "user", "content": prompt}]
+        })
+    )
+    ai_output = json.loads(bedrock_resp["body"].read())["content"][0]["text"]
+    results["bedrockAnalysis"] = ai_output`);
+      }
+
+      if (hasAthena) {
+        clients.push('athena = boto3.client("athena", region_name="us-east-1")');
+        steps.push(`    # Execute Amazon Athena SQL Query
+    sql_query = event.get("sql", "SELECT * FROM learnfrombest_enterprise_db.metrics LIMIT 10;")
+    query_exec = athena.start_query_execution(
+        QueryString=sql_query,
+        ResultConfiguration={"OutputLocation": "s3://lfb-athena-query-results/"}
+    )
+    results["athenaQueryId"] = query_exec["QueryExecutionId"]`);
+      }
+
+      if (hasOpenSearch) {
+        clients.push('aoss = boto3.client("opensearchserverless", region_name="us-east-1")');
+        steps.push(`    # Vector Search Retrieval Context
+    results["vectorIndexStatus"] = "Connected to OpenSearch Serverless RAG index"`);
+      }
+
+      if (hasS3) {
+        clients.push('s3 = boto3.client("s3")');
+        steps.push(`    # Persist Execution Artifact to Amazon S3
+    artifact_key = f"tasks/${taskId}/output_{int(datetime.datetime.utcnow().timestamp())}.json"
+    s3.put_object(Bucket="lfb-enterprise-artifacts", Key=artifact_key, Body=json.dumps(event))
+    results["s3Artifact"] = f"s3://lfb-enterprise-artifacts/{artifact_key}"`);
+      }
+
+      if (hasDynamo) {
+        clients.push('dynamodb = boto3.resource("dynamodb")');
+        steps.push(`    # Record State in DynamoDB
+    table = dynamodb.Table("LearnFromBestTaskState")
+    table.put_item(Item={"taskId": "${taskId}", "updatedAt": datetime.datetime.utcnow().isoformat()})
+    results["dynamoPersisted"] = True`);
+      }
+
+      if (steps.length === 0) {
+        steps.push(`    # Custom Business Logic for Task ${taskId}
+    results["message"] = "Executed LearnFromBest middleware handler successfully"
+    results["inputReceived"] = event`);
+      }
+
+      const activeFrontendNames = Array.from(selectedState.frontend).join(", ") || "API Client";
+      const customFlowSummary = customFlows.length > 0
+        ? customFlows.map(f => `${f.fromId} -> ${f.toId} (${f.label})`).join("; ")
+        : "Standard 3-Tier Flow";
+
+      return `${imports.join("\n")}
+
+# Auto-generated by LearnFromBest Solution Architect for Task ${taskId}
+# Connected Presentation Layer: ${activeFrontendNames}
+# Custom Orchestration Flows: ${customFlowSummary}
+${clients.join("\n")}
+
+def lambda_handler(event, context):
+    print(f"[INFO] Starting execution for Task ${taskId}")
+    results = {
+        "taskId": "${taskId}",
+        "orchestrationFlows": "${customFlowSummary}",
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+
+${steps.join("\n\n")}
+
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(results)
+    }`;
+    }
+
+    function updateIamAndCodePreview() {
+      const policy = generateIamPolicyObject();
+      const actionCount = policy.Statement[0].Action.length;
+      document.getElementById("iamActionCount").textContent = `${actionCount} IAM Permissions`;
+      document.getElementById("iamPolicyPre").textContent = JSON.stringify(policy, null, 2);
+      document.getElementById("pythonPreviewPre").textContent = generateTailoredPythonCode();
+    }
+
+    function toggleBottomDrawer() {
+      drawerExpanded = !drawerExpanded;
+      const body = document.getElementById("bottomDrawerBody");
+      const btn = document.getElementById("drawerToggleBtn");
+      if (drawerExpanded) {
+        body.classList.remove("hidden");
+        btn.textContent = "▼ Collapse Details";
+      } else {
+        body.classList.add("hidden");
+        btn.textContent = "▲ Expand Details";
+      }
+      requestAnimationFrame(() => drawConnectors());
+    }
+
+    // Generate Clean Standalone SVG Export of the Current Architecture
+    function buildStandaloneArchitectureSvg() {
+      const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
+      const feList = Array.from(selectedState.frontend).map(id => ARCHITECTURE_CATALOG.frontend.tools.find(t => t.id === id)?.name || id);
+      const mwList = Array.from(selectedState.middleware).map(id => ARCHITECTURE_CATALOG.middleware.tools.find(t => t.id === id)?.name || id);
+      const beList = Array.from(selectedState.backend).map(id => ARCHITECTURE_CATALOG.backend.tools.find(t => t.id === id)?.name || id);
+
+      const renderCol = (items, x, color, title) => {
+        let out = `<text x="${x}" y="95" fill="${color}" font-family="monospace" font-size="12" font-weight="bold">${title}</text>`;
+        items.forEach((label, idx) => {
+          const y = 115 + idx * 62;
+          out += `
+            <rect x="${x}" y="${y}" width="210" height="46" rx="8" fill="#0f172a" stroke="${color}" stroke-width="1.5"/>
+            <text x="${x + 16}" y="${y + 27}" fill="#f8fafc" font-family="sans-serif" font-size="13" font-weight="bold">${label}</text>
+          `;
+        });
+        return out;
+      };
+
+      const maxRows = Math.max(feList.length, mwList.length, beList.length, 1);
+      const svgHeight = Math.max(340, 150 + maxRows * 62);
+
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="840" height="${svgHeight}" viewBox="0 0 840 ${svgHeight}">
+        <rect width="840" height="${svgHeight}" fill="#060913"/>
+        <rect x="16" y="16" width="808" height="${svgHeight - 32}" rx="14" fill="#090e1a" stroke="#1e293b" stroke-width="1.5"/>
+        <text x="36" y="50" fill="#38bdf8" font-family="monospace" font-size="13" font-weight="bold">LEARNFROMBEST SOLUTION ARCHITECTURE BLUEPRINT</text>
+        <text x="36" y="70" fill="#94a3b8" font-family="monospace" font-size="11">Task ID: ${taskId} | Generated: ${new Date().toISOString()}</text>
+        ${renderCol(feList, 36, "#38bdf8", "1. PRESENTATION")}
+        ${renderCol(mwList, 315, "#818cf8", "2. MIDDLEWARE")}
+        ${renderCol(beList, 594, "#34d399", "3. BACKEND & AI")}
+        <path d="M 252 140 L 308 140" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M 531 140 L 587 140" stroke="#34d399" stroke-width="2" stroke-dasharray="4 4"/>
+      </svg>`;
+    }
+
+    function exportDiagramSvg() {
+      const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
+      const svgContent = buildStandaloneArchitectureSvg();
+      const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lfb-architecture-${taskId}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("SVG Exported", `Downloaded lfb-architecture-${taskId}.svg`, "⬇");
+    }
+
+    function saveDiagramAsTaskProof() {
+      const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
+      const svgContent = buildStandaloneArchitectureSvg();
+      const dataUrl = "data:image/svg+xml;utf8," + encodeURIComponent(svgContent);
+
+      try {
+        const stored = localStorage.getItem("lfb_tasks");
+        if (stored) {
+          const tasks = JSON.parse(stored);
+          const idx = tasks.findIndex(t => t.id.toUpperCase() === taskId);
+          if (idx !== -1) {
+            tasks[idx].proofs = tasks[idx].proofs || [];
+            tasks[idx].proofs.push({
+              id: "proof-arch-" + Date.now(),
+              name: `architecture-blueprint-${taskId}.svg`,
+              type: "image/svg+xml",
+              size: "4.1 KB",
+              uploadedBy: "Solution Architect",
+              dataUrl
+            });
+            localStorage.setItem("lfb_tasks", JSON.stringify(tasks));
+          }
+        }
+      } catch (e) {
+        console.warn("Storage sync skipped:", e);
+      }
+
+      showToast("Architecture Saved as Proof", `Attached blueprint SVG to Task ${taskId}.`, "✓");
+    }
+
+    function proceedToLambdaStudio() {
+      const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
+      const generatedCode = generateTailoredPythonCode();
+      const iamPolicy = generateIamPolicyObject();
+
+      const payload = {
+        taskId,
+        frontend: Array.from(selectedState.frontend),
+        middleware: Array.from(selectedState.middleware),
+        backend: Array.from(selectedState.backend),
+        customFlows,
+        iamPolicy,
+        generatedCode,
+        savedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem("lfb_selected_architecture", JSON.stringify(payload));
+
+      // Populate Handoff Modal & Link
+      document.getElementById("handoffCodeBlock").textContent = generatedCode;
+      document.getElementById("launchStudioLink").href = `lambda_studio.html?taskId=${encodeURIComponent(taskId)}`;
+
+      const modal = document.getElementById("handoffModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeHandoffModal() {
+      const modal = document.getElementById("handoffModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function copyText(elementId, successTitle) {
+      const text = document.getElementById(elementId).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast(successTitle, "Copied to clipboard.", "📋");
+    }
+
+    function showToast(title, msg, icon = "✓") {
+      const banner = document.getElementById("toastBanner");
+      document.getElementById("toastTitle").textContent = title;
+      document.getElementById("toastMsg").textContent = msg;
+      document.getElementById("toastIcon").textContent = icon;
+      banner.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        banner.classList.add("hidden");
+      }, 3800);
+    }
+  </script>
+</body>
+</html>

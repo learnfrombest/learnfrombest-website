@@ -95,7 +95,7 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
 
   const [selectedProjectId, setSelectedProjectId] = useState('ALL');
   const [activeTask, setActiveTask] = useState(null);
-  const [activeView, setActiveView] = useState('kanban'); // 'kanban' | 'backlog'
+  const [activeView, setActiveView] = useState('kanban');
   const [onlyProofFilter, setOnlyProofFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -130,10 +130,34 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     localStorage.setItem('lfb_tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  // Auto-sync proofs & logs attached from Architecture Builder or Lambda Studio tabs
+  useEffect(() => {
+    const syncFromStorage = () => {
+      try {
+        const savedTasks = localStorage.getItem('lfb_tasks');
+        if (savedTasks) {
+          const parsed = JSON.parse(savedTasks);
+          setTasks(parsed);
+          if (activeTask) {
+            const refreshed = parsed.find(t => t.id === activeTask.id);
+            if (refreshed) setActiveTask(refreshed);
+          }
+        }
+      } catch (e) {
+        console.warn('Storage sync skipped:', e);
+      }
+    };
+    window.addEventListener('focus', syncFromStorage);
+    window.addEventListener('storage', syncFromStorage);
+    return () => {
+      window.removeEventListener('focus', syncFromStorage);
+      window.removeEventListener('storage', syncFromStorage);
+    };
+  }, [activeTask]);
+
   const activeProject = projects.find(p => p.id === selectedProjectId);
   const userDisplayName = currentUserEmail ? currentUserEmail.split('@')[0] : 'Raghav Swaminathan';
 
-  // Filter tasks
   const filteredTasks = tasks.filter(t => {
     if (selectedProjectId !== 'ALL' && t.projectId !== selectedProjectId) return false;
     if (onlyProofFilter && (!t.proofs || t.proofs.length === 0)) return false;
@@ -147,7 +171,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     return true;
   });
 
-  // Handle Project Creation
   const handleCreateProject = (e) => {
     e.preventDefault();
     if (!newProjName.trim() || !newProjKey.trim()) return;
@@ -167,7 +190,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     setShowNewProjectModal(false);
   };
 
-  // Handle Task Creation
   const handleCreateTask = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
@@ -194,7 +216,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     setActiveTask(createdTask);
   };
 
-  // Drag and drop
   const handleDragStart = (e, taskId) => {
     e.dataTransfer.setData('text/plain', taskId);
   };
@@ -210,7 +231,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     }
   };
 
-  // Proof Upload
   const handleProofUpload = (e) => {
     const files = e.target.files;
     if (!files || !files.length || !activeTask) return;
@@ -236,7 +256,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
     });
   };
 
-  // Comments & Sign-off
   const handleCommentSubmit = (isQuick = false) => {
     if (!activeTask) return;
     const text = isQuick
@@ -282,7 +301,7 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
           </div>
         </div>
 
-        {/* Project Selector & "+ New Project" link */}
+        {/* Project Selector */}
         <div style={{ padding: '14px 16px', borderBottom: '1px solid #1e293b' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Active Project</span>
@@ -331,6 +350,26 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
           </button>
 
           <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '16px 8px 6px' }}>
+            Engineering Studios
+          </div>
+          <a
+            href="/architecture_builder.html"
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', color: '#38bdf8', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}
+          >
+            <span>❖</span> Solution Architect
+          </a>
+          <a
+            href="/lambda_studio.html"
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', color: '#818cf8', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}
+          >
+            <span>🐍</span> Python & Lambda Studio
+          </a>
+
+          <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '14px 8px 6px' }}>
             Workspace Actions
           </div>
           <button
@@ -348,7 +387,7 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
 
           <div style={{ marginTop: 'auto', background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(51, 65, 85, 0.6)', borderRadius: '10px', padding: '12px', fontSize: '11px', color: '#94a3b8', lineHeight: 1.5 }}>
             <span style={{ color: '#34d399', fontWeight: 700, display: 'block', marginBottom: '3px' }}>✓ Verified Proof Engine</span>
-            Tasks marked "Done" allow attaching screenshot or document evidence directly to the task stream.
+            Tasks marked "Done" allow attaching architecture blueprints, Lambda execution logs, or screenshots directly to the task stream.
           </div>
         </nav>
 
@@ -406,7 +445,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
               <span>With Proof Only</span>
             </button>
 
-            {/* Create Project Button */}
             <button
               onClick={() => setShowNewProjectModal(true)}
               style={{ background: '#1e293b', border: '1px solid #4338ca', color: '#a5b4fc', padding: '7px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
@@ -414,7 +452,6 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
               ＋ New Project
             </button>
 
-            {/* Create Task Button */}
             <button
               onClick={() => { setNewTaskProjectId(selectedProjectId === 'ALL' ? projects[0].id : selectedProjectId); setShowNewTaskModal(true); }}
               style={{ background: '#4f46e5', border: 0, color: '#fff', padding: '7px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(79, 70, 229, 0.35)' }}
@@ -787,17 +824,35 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
               </p>
             </div>
 
-            {/* Proof of Completion Section */}
+            {/* Proof of Completion & Studio Launchers */}
             <div style={{ background: 'rgba(30, 41, 59, 0.5)', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <h4 style={{ margin: 0, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span>📎</span>
                   <span>Attached Proof of Completion ({activeTask.proofs ? activeTask.proofs.length : 0})</span>
                 </h4>
-                <label style={{ background: '#4f46e5', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                  ＋ Upload Proof File
-                  <input type="file" multiple onChange={handleProofUpload} style={{ display: 'none' }} />
-                </label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <a
+                    href={`/architecture_builder.html?taskId=${encodeURIComponent(activeTask.id)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ background: '#0e7490', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
+                  >
+                    ❖ 1. Design Architecture
+                  </a>
+                  <a
+                    href={`/lambda_studio.html?taskId=${encodeURIComponent(activeTask.id)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ background: '#4338ca', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
+                  >
+                    🐍 2. Open Lambda Studio
+                  </a>
+                  <label style={{ background: '#4f46e5', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                    ＋ Upload Proof File
+                    <input type="file" multiple onChange={handleProofUpload} style={{ display: 'none' }} />
+                  </label>
+                </div>
               </div>
 
               {/* Proofs Grid */}
@@ -818,7 +873,7 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
                 ))}
                 {(!activeTask.proofs || activeTask.proofs.length === 0) && (
                   <div style={{ color: '#64748b', fontSize: '12px', fontStyle: 'italic', padding: '10px 0' }}>
-                    No execution proofs attached yet. Upload screenshots or test result logs above.
+                    No execution proofs attached yet. Launch Step 1 (Architecture) or Step 2 (Lambda Studio) above, or upload screenshots manually.
                   </div>
                 )}
               </div>
