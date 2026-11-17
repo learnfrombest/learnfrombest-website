@@ -35,7 +35,7 @@ export default function LandingPage({ user, userEmail, onSignIn, onSignOut, onGo
     if (user) {
       navigate('/workspace');
     } else {
-      window.open('/architecture_builder.html', '_blank', 'noopener,noreferrer');
+      window.open('/architecture_builder.html?v=2', '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -86,7 +86,7 @@ export default function LandingPage({ user, userEmail, onSignIn, onSignOut, onGo
         </div>
       </header>
 
-      {/* ─── HERO SECTION (MATCHING MONITOR CONCEPT) ─── */}
+      {/* ─── HERO SECTION ─── */}
       <section id="top" className="lfb-hero">
         <div className="lfb-hero-grid">
           {/* Left Copy & Dual CTAs */}

@@ -145,7 +145,7 @@
     <!-- LEFT PANEL: 3-TIER COMPONENT SELECTOR -->
     <aside class="w-full lg:w-[410px] xl:w-[450px] h-1/2 lg:h-full bg-[#090e1a] border-b lg:border-b-0 lg:border-r border-slate-800 flex flex-col shrink-0">
       
-      <!-- Panel Header & Mobile Presets -->
+      <!-- Panel Header -->
       <div class="p-3.5 border-b border-slate-800/90 bg-slate-950/60 flex items-center justify-between">
         <div>
           <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">3-Tier Architecture Stack</h2>
@@ -156,7 +156,7 @@
         </span>
       </div>
 
-      <!-- Scrollable 3 Sections -->
+      <!-- Scrollable 3 Sections + Custom Flows -->
       <div id="selectorContainer" class="flex-1 overflow-y-auto p-3.5 space-y-4">
         <!-- Populated dynamically via JS -->
       </div>
@@ -298,7 +298,7 @@
     </section>
   </main>
 
-  <!-- ─── MODAL: CODE HANDOFF MODAL (When opened standalone without parent router) ─── -->
+  <!-- ─── MODAL: CODE HANDOFF MODAL ─── -->
   <div id="handoffModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[88vh]">
       <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
@@ -511,7 +511,7 @@
       backend: new Set(["bedrock", "athena"])
     };
 
-    // Custom Directional Flows (supports intra-layer & cross-layer links)
+    // Custom Directional Flows
     let customFlows = [
       {
         id: "flow-default-eb-lambda",
@@ -523,9 +523,7 @@
       }
     ];
 
-    // Direct Canvas Click-to-Link State
     let pendingLinkSource = null;
-
     let drawerExpanded = false;
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -571,13 +569,11 @@
       }
     }
 
-    // Render Left 3-Tier Component Selector + Custom Flows Builder
     function renderSelectorPanel() {
       const container = document.getElementById("selectorContainer");
       const activeNodes = getAllActiveNodesList();
       let html = "";
 
-      // Interactive Custom Flows / Link Nodes Section
       const optionsHtml = activeNodes.map(n =>
         `<option value="${n.compositeId}">${n.name} (${n.tierKey})</option>`
       ).join("");
@@ -648,7 +644,6 @@
               </div>
             `}
 
-            <!-- Active Custom Flows List -->
             ${customFlows.length > 0 ? `
               <div class="pt-1.5 border-t border-slate-800/80 space-y-1.5 max-h-32 overflow-y-auto">
                 ${customFlows.map(flow => {
@@ -828,7 +823,7 @@
 
       const src = pendingLinkSource;
       pendingLinkSource = null;
-      const defaultLabel = src.fromId === "eventbridge" || src.toolId === "eventbridge"
+      const defaultLabel = src.toolId === "eventbridge"
         ? "Scheduled / Event Rule"
         : src.toolId === "sqs"
         ? "Poll Batch"
@@ -872,26 +867,6 @@
       renderDiagram();
     }
 
-    function applyPreset(presetKey) {
-      const preset = PRESETS[presetKey];
-      if (!preset) return;
-      selectedState.frontend = new Set(preset.frontend);
-      selectedState.middleware = new Set(preset.middleware);
-      selectedState.backend = new Set(preset.backend);
-      renderSelectorPanel();
-      renderDiagram();
-      showToast(`Loaded "${preset.name}"`, "Architecture diagram and IAM policy updated.", "✨");
-    }
-
-    function clearAllSelections() {
-      selectedState.frontend.clear();
-      selectedState.middleware.clear();
-      selectedState.backend.clear();
-      renderSelectorPanel();
-      renderDiagram();
-    }
-
-    // Render Right Dynamic Solution Diagram
     function renderDiagram() {
       const totalSelected =
         selectedState.frontend.size +
@@ -1018,7 +993,6 @@
       requestAnimationFrame(() => drawConnectors());
     }
 
-    // Draw Animated SVG Bezier Connectors Between Active Tiers + Custom Intra/Cross Flows
     function drawConnectors() {
       const stage = document.getElementById("diagramStage");
       const linesGroup = document.getElementById("connectorLinesGroup");
@@ -1046,7 +1020,6 @@
         const sTier = sourceEl.getAttribute("data-tier");
         const tTier = targetEl.getAttribute("data-tier");
 
-        // Intra-Column (Same-Tier Vertical Arc along right margin so card text stays clear)
         if (sTier === tTier) {
           const x1 = sRect.right - stageRect.left - 2;
           const y1 = sRect.top + sRect.height / 2 - stageRect.top;
@@ -1070,7 +1043,6 @@
           return;
         }
 
-        // Cross-Column Horizontal Bezier Curve
         const isLeftToRight = sRect.left < tRect.left;
         const x1 = isLeftToRight ? sRect.right - stageRect.left : sRect.left - stageRect.left;
         const y1 = sRect.top + sRect.height / 2 - stageRect.top;
@@ -1094,7 +1066,6 @@
         }
       }
 
-      // 1. Default Cross-Layer Flows (Frontend -> Middleware -> Backend)
       if (feNodes.length > 0 && mwNodes.length > 0) {
         feNodes.forEach((fe, i) => {
           mwNodes.forEach((mw, j) => {
@@ -1116,7 +1087,6 @@
         });
       }
 
-      // Direct Frontend -> Backend if no Middleware selected
       if (feNodes.length > 0 && mwNodes.length === 0 && beNodes.length > 0) {
         feNodes.forEach((fe, i) => {
           beNodes.forEach((be, j) => {
@@ -1126,7 +1096,6 @@
         });
       }
 
-      // 2. Custom User-Defined Flows (including intra-column EventBridge -> Lambda)
       customFlows.forEach((flow, idx) => {
         const srcEl = document.getElementById(`node-${flow.fromTier}-${flow.fromId}`);
         const tgtEl = document.getElementById(`node-${flow.toTier}-${flow.toId}`);
@@ -1138,7 +1107,6 @@
       linesGroup.innerHTML = svgMarkup;
     }
 
-    // Build Scoped IAM Policy & Tailored Python Lambda Code
     function generateIamPolicyObject() {
       const actions = new Set(["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]);
 
@@ -1282,7 +1250,6 @@ ${steps.join("\n\n")}
       requestAnimationFrame(() => drawConnectors());
     }
 
-    // Generate Clean Standalone SVG Export of the Current Architecture
     function buildStandaloneArchitectureSvg() {
       const taskId = (document.getElementById("taskIdInput").value.trim() || "IDP-102").toUpperCase();
       const feList = Array.from(selectedState.frontend).map(id => ARCHITECTURE_CATALOG.frontend.tools.find(t => t.id === id)?.name || id);
@@ -1380,7 +1347,6 @@ ${steps.join("\n\n")}
 
       localStorage.setItem("lfb_selected_architecture", JSON.stringify(payload));
 
-      // Populate Handoff Modal & Link
       document.getElementById("handoffCodeBlock").textContent = generatedCode;
       document.getElementById("launchStudioLink").href = `lambda_studio.html?taskId=${encodeURIComponent(taskId)}`;
 
