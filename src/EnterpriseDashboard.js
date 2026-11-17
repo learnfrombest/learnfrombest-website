@@ -1,15 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function EnterpriseDashboard({ onSignOut }) {
+export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
   const navigate = useNavigate();
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'radial-gradient(ellipse at top, #1e1b4b 0%, #0f172a 70%)',
-      color: '#fff',
-      padding: '40px 24px',
+      background: 'radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.12), transparent 40%), #060b16',
+      color: '#f8fafc',
+      padding: '36px 24px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -18,177 +18,221 @@ export default function EnterpriseDashboard({ onSignOut }) {
       {/* Top Bar */}
       <header style={{
         width: '100%',
-        maxWidth: '1100px',
+        maxWidth: '1060px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '60px'
+        marginBottom: '52px'
       }}>
-        <div style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.5px' }}>
-          LearnFromBest
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #4f46e5, #38bdf8)',
+            display: 'grid',
+            placeItems: 'center',
+            fontWeight: 900
+          }}>
+            L
+          </div>
+          <span style={{ fontWeight: 800, fontSize: '17px' }}>LearnFromBest</span>
+          <span style={{
+            fontSize: '11px',
+            background: 'rgba(56, 189, 248, 0.12)',
+            color: '#38bdf8',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            padding: '2px 8px',
+            borderRadius: '6px',
+            fontWeight: 700
+          }}>
+            AI-ERP STUDIO
+          </span>
         </div>
-        {onSignOut && (
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {userEmail && (
+            <span style={{ fontSize: '12px', color: '#94a3b8' }}>{userEmail}</span>
+          )}
           <button
-            onClick={onSignOut}
+            onClick={() => navigate('/home')}
             style={{
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'transparent',
+              border: '1px solid rgba(148, 163, 184, 0.25)',
               color: '#cbd5e1',
-              padding: '8px 16px',
+              padding: '7px 14px',
               borderRadius: '8px',
               cursor: 'pointer',
-              fontSize: '13px'
+              fontSize: '12px'
             }}
           >
-            ← Sign Out
+            Home
           </button>
-        )}
+          {onSignOut && (
+            <button
+              onClick={onSignOut}
+              style={{
+                background: 'rgba(239, 68, 68, 0.14)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                color: '#fca5a5',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: 600
+              }}
+            >
+              Sign Out
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Hero Headline */}
-      <div style={{ textAlign: 'center', marginBottom: '48px', maxWidth: '720px' }}>
-        <h1 style={{
-          fontSize: '42px',
-          fontWeight: 800,
-          margin: '0 0 16px',
-          letterSpacing: '-1px'
-        }}>
-          Enterprise AI Studio
+      <div style={{ textAlign: 'center', marginBottom: '44px', maxWidth: '720px' }}>
+        <h1 style={{ fontSize: '38px', fontWeight: 800, margin: '0 0 14px', letterSpacing: '-0.8px' }}>
+          Choose Your <span style={{ color: '#38bdf8' }}>Workspace Mode</span>
         </h1>
-        <p style={{
-          fontSize: '16px',
-          color: '#94a3b8',
-          margin: 0,
-          lineHeight: 1.6
-        }}>
-          Choose a path to begin training foundation models or build and test live production workloads.
+        <p style={{ fontSize: '15px', color: '#94a3b8', margin: 0, lineHeight: 1.6 }}>
+          Design governed multi-cloud AI-ERP pipelines, execute sandboxed Python agents, and generate SHA-256 verified proof artifacts.
         </p>
       </div>
 
-      {/* 2 Primary Action Boxes */}
+      {/* 2 Primary Path Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 420px))',
-        gap: '28px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 440px))',
+        gap: '24px',
         width: '100%',
-        maxWidth: '920px',
+        maxWidth: '940px',
         justifyContent: 'center'
       }}>
-        {/* Box 1: Train AI */}
-        <div
-          onClick={() => navigate('/dashboard')}
-          style={{
-            background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
-            borderRadius: '16px',
-            padding: '36px 28px',
-            cursor: 'pointer',
-            transition: 'all 0.25s ease',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#818cf8';
-            e.currentTarget.style.transform = 'translateY(-4px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <div>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '12px',
-              background: 'rgba(99, 102, 241, 0.15)',
-              border: '1px solid rgba(99, 102, 241, 0.4)',
-              display: 'grid',
-              placeItems: 'center',
-              fontSize: '28px',
-              marginBottom: '20px'
-            }}>
-              🧠
-            </div>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 10px' }}>
-              Train AI
-            </h2>
-            <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
-              Build domain datasets, fine-tune model parameters, configure RAG embeddings, and prompt test foundation LLMs.
-            </p>
-          </div>
-          <div style={{
-            marginTop: '28px',
-            fontSize: '13px',
-            color: '#a5b4fc',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}>
-            Open AI Training Studio →
-          </div>
-        </div>
-
-        {/* Box 2: Work on Real Time Applications */}
+        {/* Path 1: AI-ERP Real-Time Workspace (B2B + Builder) */}
         <div
           onClick={() => navigate('/workspace')}
           style={{
-            background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
+            background: 'linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, #0c1426 100%)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
             borderRadius: '16px',
-            padding: '36px 28px',
+            padding: '32px 28px',
             cursor: 'pointer',
-            transition: 'all 0.25s ease',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#60a5fa';
-            e.currentTarget.style.transform = 'translateY(-4px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
+            transition: 'all 0.2s ease',
+            boxShadow: '0 14px 34px rgba(0,0,0,0.4)'
           }}
         >
-          <div>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '12px',
-              background: 'rgba(59, 130, 246, 0.15)',
-              border: '1px solid rgba(59, 130, 246, 0.4)',
-              display: 'grid',
-              placeItems: 'center',
-              fontSize: '28px',
-              marginBottom: '20px'
-            }}>
-              ⚡
-            </div>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 10px' }}>
-              Work on Real Time Applications
-            </h2>
-            <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
-              Access live enterprise projects, manage backlog stories and Kanban boards, complete tasks, and attach verified execution proof.
-            </p>
-          </div>
           <div style={{
-            marginTop: '28px',
-            fontSize: '13px',
-            color: '#93c5fd',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
+            display: 'inline-block',
+            fontSize: '11px',
+            fontWeight: 700,
+            color: '#34d399',
+            background: 'rgba(16, 185, 129, 0.15)',
+            padding: '3px 9px',
+            borderRadius: '6px',
+            marginBottom: '16px'
           }}>
-            Open Real-Time Workspace →
+            B2B ENTERPRISE & PROOF ENGINE
+          </div>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 10px' }}>
+            AI-ERP Project & Agent Studio
+          </h2>
+          <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6, margin: '0 0 24px' }}>
+            Manage enterprise Kanban boards, wire multi-cloud Solution Architectures, deploy sandboxed Python Lambdas, and sign off verified execution proofs.
+          </p>
+          <div style={{ fontSize: '13px', color: '#38bdf8', fontWeight: 700 }}>
+            Enter AI-ERP Workspace →
           </div>
         </div>
+
+        {/* Path 2: Train AI & Foundation Models (B2C / Labs) */}
+        <div
+          onClick={() => navigate('/dashboard')}
+          style={{
+            background: '#0c1426',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '16px',
+            padding: '32px 28px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 14px 34px rgba(0,0,0,0.4)'
+          }}
+        >
+          <div style={{
+            display: 'inline-block',
+            fontSize: '11px',
+            fontWeight: 700,
+            color: '#a5b4fc',
+            background: 'rgba(99, 102, 241, 0.15)',
+            padding: '3px 9px',
+            borderRadius: '6px',
+            marginBottom: '16px'
+          }}>
+            MODEL LABS & VERTICAL TEMPLATES
+          </div>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 10px' }}>
+            Train AI & Vertical Automations
+          </h2>
+          <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6, margin: '0 0 24px' }}>
+            Configure RAG datasets, test Hugging Face and Bedrock prompts, and explore pre-built Banking, Retail, and Manufacturing automation suites.
+          </p>
+          <div style={{ fontSize: '13px', color: '#a5b4fc', fontWeight: 700 }}>
+            Open Model & Automation Labs →
+          </div>
+        </div>
+      </div>
+
+      {/* Direct Studio Shortcuts */}
+      <div style={{
+        marginTop: '32px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '12px',
+        justifyContent: 'center'
+      }}>
+        <a
+          href="/architecture_builder.html"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            background: '#0c1426',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            color: '#38bdf8',
+            padding: '10px 18px',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 700,
+            textDecoration: 'none'
+          }}
+        >
+          ❖ Direct: Solution Architecture Builder
+        </a>
+        <a
+          href="/lambda_studio.html"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            background: '#0c1426',
+            border: '1px solid rgba(129, 140, 248, 0.3)',
+            color: '#a5b4fc',
+            padding: '10px 18px',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 700,
+            textDecoration: 'none'
+          }}
+        >
+          🐍 Direct: Python & AWS Lambda Studio
+        </a>
+        {isAdmin && (
+          <span style={{
+            alignSelf: 'center',
+            fontSize: '12px',
+            color: '#34d399',
+            fontWeight: 700,
+            padding: '0 8px'
+          }}>
+            ★ Admin Mode Active
+          </span>
+        )}
       </div>
     </div>
   );

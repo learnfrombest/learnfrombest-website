@@ -1,358 +1,409 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './LandingPage.css';
-import ChatBot from './ChatBot';
-import LandingAnimation from './LandingAnimation';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const WHATSAPP_NUMBER = '919567096415';
-const WHATSAPP_MSG = encodeURIComponent("Hi! I'm interested in AI Tutoring Academy. Can you tell me more?");
-const PAYPAL_URL = 'https://www.paypal.com/ncp/payment/5328GD3ZAXD24';
+export default function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) {
+  const navigate = useNavigate();
+  const [activePreviewNode, setActivePreviewNode] = useState('harness');
+  const [b2bLeadEmail, setB2bLeadEmail] = useState('');
+  const [b2bCompany, setB2bCompany] = useState('');
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
 
-function LandingPage({ user, userEmail, onSignIn, onSignOut, onGoToDashboard }) {
-
-  const [visibleSections, setVisibleSections] = useState({});
-  const sectionRefs = useRef({});
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => ({ ...prev, [entry.target.id]: true }));
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    Object.values(sectionRefs.current).forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  const setRef = (id) => (el) => {
-    sectionRefs.current[id] = el;
+  const nodeDetails = {
+    eventbridge: {
+      title: 'AWS EventBridge / ERP Trigger',
+      badge: 'Event Ingestion',
+      desc: 'Listens to ERP invoice webhooks, S3 document drops, or scheduled batch triggers with zero idle compute.'
+    },
+    harness: {
+      title: 'Lambda + Harness Guardrail Engine',
+      badge: 'Policy-as-Code Gate',
+      desc: 'Enforces read-only SQL checks, PII redaction, least-privilege IAM, and $10k approval thresholds before execution.'
+    },
+    bedrock: {
+      title: 'Amazon Bedrock & Hugging Face Models',
+      badge: 'Multi-Model Inference',
+      desc: 'Routes extraction and reasoning tasks across Claude 3.5 Sonnet and open-weight Hugging Face models.'
+    },
+    bigquery: {
+      title: 'GCP BigQuery & Azure OpenAI',
+      badge: 'Cross-Cloud Data & AI',
+      desc: 'Queries enterprise data warehouses in BigQuery and reconciles ERP records across AWS, GCP, and Azure.'
+    }
   };
 
-  const features = [
-    { icon: '🤖', title: 'AI-Powered Tutors', text: 'Get 1-on-1 sessions with specialised AI tutors trained on thousands of curriculum topics — available 24/7.' },
-    { icon: '📊', title: 'Adaptive Learning', text: 'Our engine tracks your progress in real time and adjusts difficulty, pacing and content to keep you in the flow zone.' },
-    { icon: '🎯', title: 'Job Guarantee', text: 'Land a ₱50K+ salary job or get a full refund. Our placement team works with you until you have an offer letter.' },
-    { icon: '💬', title: 'Instant Feedback', text: 'Submit code, essays or assignments and receive detailed AI feedback within seconds — not days.' },
-    { icon: '🌐', title: 'Industry Projects', text: 'Build real-world projects used by companies. Your portfolio will stand out in every interview.' },
-    { icon: '📱', title: 'Certificate of Completion', text: 'Earn a verified certificate recognised by top employers across the Philippines and globally.' },
-  ];
+  const handleLaunchSandbox = () => {
+    if (user) {
+      navigate('/workspace');
+    } else {
+      window.open('/architecture_builder.html', '_blank', 'noopener,noreferrer');
+    }
+  };
 
-  const plans = [
-    {
-      id: 'free',
-      name: 'Zero to Hero Pack',
-      price: 'FREE',
-      badge: 'Start Here',
-      highlight: false,
-      features: [
-        'Full Zero to Hero curriculum',
-        'AI-powered learning modules',
-        'Progress dashboard',
-        'Community Discord access',
-        'Certificate of Completion',
-        'Access to 50+ core subjects',
-      ],
-      cta: 'Get Free Access',
-      ctaAction: 'whatsapp',
-    },
-    {
-      id: 'pro',
-      name: 'Job Assurance Pack',
-      price: '$49',
-      badge: '🔥 Best Value',
-      highlight: true,
-      features: [
-        'Everything in Zero to Hero',
-        '₱50K salary job guarantee',
-        'Dedicated placement manager',
-        'Unlimited 1:1 mentorship',
-        'Live mock interviews',
-        'Resume & LinkedIn review',
-        'Priority WhatsApp support',
-        'Lifetime access to all content',
-      ],
-      cta: 'Get Job Guaranteed →',
-      ctaAction: 'paypal',
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'Maria Santos',
-      role: 'Now earning ₱65K/month at Globe Telecom',
-      avatar: '👩‍💻',
-      rating: 5,
-      text: 'I went from zero coding knowledge to a ₱65K job in 4 months. The job guarantee kept me motivated and the mentors were incredible.',
-    },
-    {
-      name: 'Juan dela Cruz',
-      role: 'Software Engineer at Accenture Philippines',
-      avatar: '👨‍💼',
-      rating: 5,
-      text: 'The Job Assurance Pack paid for itself in the first week of my new salary. 100% worth every penny. Got placed in 3 months.',
-    },
-    {
-      name: 'Ana Reyes',
-      role: 'Data Analyst at BDO Unibank',
-      avatar: '🧑‍🎓',
-      rating: 5,
-      text: 'The certificate opened doors I never thought possible. 5 interview calls in the first week after completing the course.',
-    },
-    
-  ];
+  const handleB2bDemoSubmit = (e) => {
+    e.preventDefault();
+    if (!b2bLeadEmail.trim()) return;
+    setLeadSubmitted(true);
+    setB2bLeadEmail('');
+    setB2bCompany('');
+  };
 
   return (
-    <div className="lp-root">
-
-      {/* Intro animation — flies in from sky on first load */}
-      <LandingAnimation />
-
-      {/* Animated background particles */}
-      <div className="lp-particles" aria-hidden="true">
-        {[...Array(20)].map((_, i) => (
-          <div key={i} className="lp-particle" style={{ '--i': i }} />
-        ))}
-      </div>
-
-      {/* NAV */}
-      <header className="lp-header">
-        <div className="lp-logo">
-          <span className="lp-logo-icon">🎓</span>
-          AI Tutoring <span className="lp-logo-accent">Academy</span>
-        </div>
-        <nav className="lp-nav">
-          <a href="#features" className="lp-nav-link">Features</a>
-          <a href="#pricing" className="lp-nav-link">Pricing</a>
-          <a href="#testimonials" className="lp-nav-link">Reviews</a>
-          <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`} target="_blank" rel="noreferrer" className="lp-wa-nav-btn">
-            💬 WhatsApp Us
+    <div className="lfb-page">
+      {/* ─── TOP NAVIGATION BAR ─── */}
+      <header className="lfb-navbar">
+        <div className="lfb-nav-inner">
+          <a href="#top" className="lfb-brand">
+            <div className="lfb-logo-icon">L</div>
+            <span className="lfb-brand-text">LearnFromBest</span>
           </a>
-          {user ? (
-            <>
-              <button className="lp-btn-outline" onClick={onGoToDashboard}>Dashboard</button>
-              <button className="lp-btn-primary" onClick={onSignOut}>Sign Out</button>
-            </>
-          ) : (
-            <button className="lp-btn-primary" onClick={onSignIn}>Sign In</button>
-          )}
-        </nav>
+
+          <nav className="lfb-nav-links">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#solutions">Solutions</a>
+            <a href="#b2b-enterprise">B2B Enterprise</a>
+            <a href="#pricing">Pricing</a>
+          </nav>
+
+          <div className="lfb-nav-actions">
+            {user ? (
+              <>
+                <button
+                  onClick={() => navigate('/workspace')}
+                  className="lfb-btn-outline-sm"
+                >
+                  Open Workspace
+                </button>
+                <button onClick={onSignOut} className="lfb-btn-signin">
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button onClick={onSignIn} className="lfb-btn-signin">
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
       </header>
 
-      {/* HERO */}
-      <section className="lp-hero-wrap">
-
-        {/* LEFT — Job locations */}
-        <aside className="lp-hero-left">
-          <div className="lp-locations-label">🌍 Jobs Waiting For You</div>
-          <div className="lp-locations-list">
-            {[
-              { flag: '🇺🇸', city: 'New York', country: 'USA',       role: 'AI Engineer' },
-              { flag: '🇺🇸', city: 'San Francisco', country: 'USA',  role: 'Data Scientist' },
-              { flag: '🇺🇸', city: 'Seattle', country: 'USA',        role: 'ML Engineer' },
-              { flag: '🇬🇧', city: 'London', country: 'UK',          role: 'Cloud Architect' },
-              { flag: '🇬🇧', city: 'Manchester', country: 'UK',      role: 'DevOps Lead' },
-              { flag: '🇨🇦', city: 'Toronto', country: 'Canada',     role: 'Full Stack Dev' },
-              { flag: '🇨🇦', city: 'Vancouver', country: 'Canada',   role: 'Backend Engineer' },
-              { flag: '🇦🇺', city: 'Sydney', country: 'Australia',   role: 'Product Manager' },
-              { flag: '🇦🇺', city: 'Melbourne', country: 'Australia',role: 'Data Analyst' },
-            ].map((loc, i) => (
-              <div key={loc.city} className="lp-location-card" style={{ '--li': i }}>
-                <span className="lp-location-flag">{loc.flag}</span>
-                <div className="lp-location-info">
-                  <div className="lp-location-city">{loc.city}, {loc.country}</div>
-                  <div className="lp-location-role">{loc.role}</div>
-                </div>
-                <span className="lp-location-dot" />
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        {/* CENTER — main hero */}
-        <div className="lp-hero">
-          <div className="lp-hero-badge">🚀 Trusted by 50,000+ learners across the Philippines</div>
-          <h1 className="lp-hero-title">
-            Land Your Dream Job with<br />
-            <span className="lp-hero-highlight">AI-Powered Learning</span>
-          </h1>
-          <p className="lp-hero-sub">
-            From $50,000 to $150,000/year salary — guaranteed. Our AI tutors, live mentors and placement team work until you get hired.
-          </p>
-          <div className="lp-hero-ctas">
-            <button className="lp-btn-hero" onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}>
-              View Plans →
-            </button>
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`} target="_blank" rel="noreferrer" className="lp-btn-wa-hero">
-              💬 Chat on WhatsApp
-            </a>
-          </div>
-          <div className="lp-hero-stats">
-            {[['50K+', 'Active Learners'], ['₱50K+', 'Avg Salary'], ['98%', 'Placement Rate'], ['24/7', 'AI Support']].map(([val, label]) => (
-              <div key={label} className="lp-stat">
-                <div className="lp-stat-val">{val}</div>
-                <div className="lp-stat-label">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT — learner photo grid */}
-        <aside className="lp-hero-right">
-          <div className="lp-photos-label">👩‍💻 Our Learners</div>
-          <div className="lp-photo-grid">
-            {[
-              {
-                url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=320&h=220&fit=crop&crop=faces',
-                caption: 'Group learning session',
-              },
-              {
-                url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=320&h=220&fit=crop&crop=faces',
-                caption: 'Focused study time',
-              },
-              {
-                url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=320&h=220&fit=crop&crop=faces',
-                caption: 'Team project work',
-              },
-              {
-                url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=320&h=220&fit=crop&crop=faces',
-                caption: 'Live mentor session',
-              },
-            ].map((img, i) => (
-              <div key={i} className="lp-photo-card" style={{ '--pi': i }}>
-                <img src={img.url} alt={img.caption} className="lp-photo-img" loading="lazy" />
-                <div className="lp-photo-caption">{img.caption}</div>
-                <div className="lp-photo-shine" />
-              </div>
-            ))}
-          </div>
-          <div className="lp-photos-badge">🎓 Join 50,000+ learners</div>
-        </aside>
-
-      </section>
-
-      {/* FEATURES */}
-      <section
-        id="features"
-        className={`lp-section lp-animate ${visibleSections['features'] ? 'lp-visible' : ''}`}
-        ref={setRef('features')}
-      >
-        <h2 className="lp-section-title">Why Learners Choose Us</h2>
-        <p className="lp-section-sub">Everything you need to go from beginner to employed — in one platform.</p>
-        <div className="lp-card-grid">
-          {features.map((f, i) => (
-            <div key={f.title} className="lp-card" style={{ '--delay': `${i * 0.1}s` }}>
-              <div className="lp-card-icon">{f.icon}</div>
-              <div className="lp-card-title">{f.title}</div>
-              <div className="lp-card-text">{f.text}</div>
+      {/* ─── HERO SECTION (MATCHING MONITOR CONCEPT) ─── */}
+      <section id="top" className="lfb-hero">
+        <div className="lfb-hero-grid">
+          {/* Left Copy & Dual CTAs */}
+          <div className="lfb-hero-left">
+            <div className="lfb-pill-badge">
+              <span className="lfb-dot-pulse"></span>
+              <span>AI-ERP Orchestration & Multi-Cloud Governance</span>
             </div>
-          ))}
+
+            <h1 className="lfb-hero-title">
+              <span className="lfb-cyan">Design, Run,</span> and Verify{' '}
+              <span className="lfb-cyan">Production</span> AI Agents
+            </h1>
+
+            <p className="lfb-hero-subtitle">
+              With <span className="lfb-cyan-bold">Built-In Multi-Cloud Safety Guardrails</span>. Map AWS, GCP, Azure, and Hugging Face workflows visually, run sandboxed Python agents, and attach SHA-256 execution proofs to every ERP task.
+            </p>
+
+            <div className="lfb-hero-ctas">
+              <button onClick={handleLaunchSandbox} className="lfb-btn-primary-glow">
+                Try Live Sandbox (Free)
+              </button>
+              <a href="#b2b-enterprise" className="lfb-btn-secondary">
+                Explore B2B Team Plans
+              </a>
+            </div>
+          </div>
+
+          {/* Right Interactive Blueprint Preview Card */}
+          <div className="lfb-hero-right">
+            <div className="lfb-window-card">
+              {/* macOS Window Top Bar */}
+              <div className="lfb-window-bar">
+                <div className="lfb-traffic-lights">
+                  <span className="dot-red"></span>
+                  <span className="dot-yellow"></span>
+                  <span className="dot-green"></span>
+                </div>
+                <div className="lfb-window-title">
+                  <span className="mini-l">L</span> Solution Architecture Builder
+                </div>
+                <div className="lfb-window-badges">
+                  <span className="win-tag">Harness v2</span>
+                  <button
+                    onClick={handleLaunchSandbox}
+                    className="win-live-btn"
+                  >
+                    Live Preview ↗
+                  </button>
+                </div>
+              </div>
+
+              {/* Blueprint Canvas */}
+              <div className="lfb-blueprint-canvas">
+                <div className="bp-label">Blueprint • Autonomous AI-ERP Pipeline</div>
+
+                <div className="bp-flow-stage">
+                  {/* Node 1: EventBridge */}
+                  <button
+                    type="button"
+                    onClick={() => setActivePreviewNode('eventbridge')}
+                    className={`bp-node node-pink ${activePreviewNode === 'eventbridge' ? 'active' : ''}`}
+                  >
+                    <div className="bp-node-icon">⚡</div>
+                    <div className="bp-node-name">AWS EventBridge</div>
+                  </button>
+
+                  <div className="bp-connector">──▶</div>
+
+                  {/* Center Harness Box */}
+                  <div className="bp-harness-frame">
+                    <div className="bp-harness-tag">Connect & Govern</div>
+                    <button
+                      type="button"
+                      onClick={() => setActivePreviewNode('harness')}
+                      className={`bp-node node-amber ${activePreviewNode === 'harness' ? 'active' : ''}`}
+                    >
+                      <div className="bp-node-icon">λ</div>
+                      <div className="bp-node-name">Lambda + Harness</div>
+                    </button>
+                  </div>
+
+                  <div className="bp-connector">──▶</div>
+
+                  {/* Right Multi-Cloud Targets */}
+                  <div className="bp-targets-col">
+                    <button
+                      type="button"
+                      onClick={() => setActivePreviewNode('bedrock')}
+                      className={`bp-node node-emerald ${activePreviewNode === 'bedrock' ? 'active' : ''}`}
+                    >
+                      <div className="bp-node-icon">🧠</div>
+                      <div className="bp-node-name">Bedrock + HF</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActivePreviewNode('bigquery')}
+                      className={`bp-node node-blue ${activePreviewNode === 'bigquery' ? 'active' : ''}`}
+                    >
+                      <div className="bp-node-icon">📊</div>
+                      <div className="bp-node-name">BigQuery / Azure</div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Interactive Node Inspector Strip */}
+                <div className="bp-inspector">
+                  <div className="bp-inspector-head">
+                    <strong>{nodeDetails[activePreviewNode].title}</strong>
+                    <span>{nodeDetails[activePreviewNode].badge}</span>
+                  </div>
+                  <p>{nodeDetails[activePreviewNode].desc}</p>
+                </div>
+              </div>
+            </div>
+            <div className="lfb-caption">Click any node above to inspect multi-cloud harness controls</div>
+          </div>
+        </div>
+
+        {/* ─── 3-STEP VISUAL STRIP + CLOUD PROVIDER BAR ─── */}
+        <div id="how-it-works" className="lfb-strip-wrapper">
+          <div className="lfb-strip-header">
+            <h2>3-Step Visual Strip</h2>
+            <div className="lfb-cloud-bar">
+              <span className="cloud-pill aws">aws</span>
+              <span className="cloud-pill gcp">Google Cloud</span>
+              <span className="cloud-pill azure">Azure</span>
+              <span className="cloud-pill hf">🤗 Hugging Face</span>
+            </div>
+          </div>
+
+          <div className="lfb-steps-grid">
+            <div className="lfb-step-card step-cyan">
+              <div className="step-num">1. Draw the Stack</div>
+              <p>Select Frontend, Middleware Agents, and AI/Data nodes across AWS, GCP, Azure, and Hugging Face with custom flow wiring.</p>
+            </div>
+            <div className="lfb-step-card step-indigo">
+              <div className="step-num">2. Run With Guardrails</div>
+              <p>Auto-generate least-privilege IAM policies, SQL read-only checks, and Python Lambda handlers in an isolated sandbox.</p>
+            </div>
+            <div className="lfb-step-card step-emerald">
+              <div className="step-num">3. Attach Verified Proof</div>
+              <p>Every run produces a SHA-256 execution certificate and CloudWatch audit log signed off on your team Kanban board.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* PRICING */}
-      <section
-        id="pricing"
-        className={`lp-section lp-animate ${visibleSections['pricing'] ? 'lp-visible' : ''}`}
-        ref={setRef('pricing')}
-      >
-        <h2 className="lp-section-title">Simple, Transparent Pricing</h2>
-        <p className="lp-section-sub">Two plans. No hidden fees. Job guarantee or your money back.</p>
-        <div className="lp-pricing-grid">
-          {plans.map((plan, i) => (
-            <div
-              key={plan.id}
-              className={`lp-pricing-card ${plan.highlight ? 'lp-pricing-featured' : ''}`}
-              style={{ '--delay': `${i * 0.15}s` }}
-            >
-              {plan.badge && <div className="lp-pricing-badge">{plan.badge}</div>}
-              <div className="lp-pricing-name">{plan.name}</div>
-              <div className="lp-pricing-price">{plan.price}</div>
-              <ul className="lp-pricing-features">
-                {plan.features.map((f) => (
-                  <li key={f}><span className="lp-check">✓</span> {f}</li>
-                ))}
+      {/* ─── SOLUTIONS: B2C VS B2B PERSONA SPLIT ─── */}
+      <section id="solutions" className="lfb-section">
+        <div className="lfb-container">
+          <div className="lfb-section-head">
+            <span className="lfb-eyebrow">BUILT FOR BUILDERS & ENTERPRISES</span>
+            <h2>One Platform. Two High-Velocity Paths.</h2>
+          </div>
+
+          <div className="lfb-persona-grid">
+            {/* B2C Card */}
+            <div className="lfb-persona-card">
+              <div className="persona-tag tag-cyan">For Individual Engineers & Builders</div>
+              <h3>Build a Verified Multi-Cloud AI Portfolio</h3>
+              <p>
+                Stop relying on passive video courses. Architect real AI-ERP workflows, deploy live Python Lambdas, and graduate with tamper-evident SHA-256 proof certificates you can share with global recruiters.
+              </p>
+              <ul className="persona-list">
+                <li>✓ Unlimited Solution Architecture diagrams & SVG exports</li>
+                <li>✓ Browser Python simulator + live AWS/HF sandbox runs</li>
+                <li>✓ Shareable verified portfolio links for LinkedIn & resumes</li>
               </ul>
-              {plan.ctaAction === 'paypal' ? (
-                <a href={PAYPAL_URL} target="_blank" rel="noreferrer" className="lp-btn-hero lp-plan-btn">
-                  {plan.cta}
-                </a>
-              ) : (
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi! I want to start the FREE Zero to Hero Pack!')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="lp-btn-outline lp-plan-btn"
-                >
-                  {plan.cta}
-                </a>
-              )}
+              <button onClick={handleLaunchSandbox} className="lfb-btn-primary-glow full-w">
+                Start Building Free ($0) →
+              </button>
             </div>
-          ))}
+
+            {/* B2B Card */}
+            <div id="b2b-enterprise" className="lfb-persona-card card-b2b">
+              <div className="persona-tag tag-emerald">For Engineering Teams, GCCs & Enterprises</div>
+              <h3>Governed AI-ERP Sandbox & Technical Vetting</h3>
+              <p>
+                Prototype autonomous ERP agents safely before touching production databases. Enforce policy-as-code guardrails, audit bench readiness, and vet candidates on real multi-cloud builds.
+              </p>
+              <ul className="persona-list">
+                <li>✓ Multi-tenant Kanban boards with role-based audit sign-offs</li>
+                <li>✓ Deterministic SQL, PII, and spend guardrails on every agent</li>
+                <li>✓ Bring-Your-Own-Cloud (BYOC) IAM deployment support</li>
+              </ul>
+              <button onClick={onSignIn} className="lfb-btn-signin full-w">
+                Launch Enterprise Workspace →
+              </button>
+            </div>
+          </div>
+
+          {/* Vertical Industry Blueprints */}
+          <div className="lfb-verticals-grid">
+            <div className="vertical-card" onClick={() => (user ? navigate('/banking') : onSignIn())}>
+              <span className="v-icon">🏦</span>
+              <h4>Banking & Accounts Payable</h4>
+              <p>Automated invoice OCR, discrepancy detection, and ledger audit trails.</p>
+            </div>
+            <div className="vertical-card" onClick={() => (user ? navigate('/supermarket') : onSignIn())}>
+              <span className="v-icon">🛒</span>
+              <h4>Retail & Inventory ERP</h4>
+              <p>Demand forecasting and autonomous purchase order guardrails.</p>
+            </div>
+            <div className="vertical-card" onClick={() => (user ? navigate('/manufacturing') : onSignIn())}>
+              <span className="v-icon">🏭</span>
+              <h4>Manufacturing Supply Chain</h4>
+              <p>Vendor SLA verification and real-time shipment anomaly routing.</p>
+            </div>
+            <div className="vertical-card" onClick={() => (user ? navigate('/fashion') : onSignIn())}>
+              <span className="v-icon">👗</span>
+              <h4>Enterprise RAG Copilot</h4>
+              <p>Multi-cloud knowledge retrieval across S3, BigQuery, and OpenSearch.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section
-        id="testimonials"
-        className={`lp-section lp-animate ${visibleSections['testimonials'] ? 'lp-visible' : ''}`}
-        ref={setRef('testimonials')}
-      >
-        <h2 className="lp-section-title">Real Results. Real People.</h2>
-        <p className="lp-section-sub">Our students are getting hired every week. Here's what they say.</p>
-        <div className="lp-testi-grid">
-          {testimonials.map((t, i) => (
-            <div key={t.name} className="lp-testi-card" style={{ '--delay': `${i * 0.1}s` }}>
-              <div className="lp-testi-stars">{'★'.repeat(t.rating)}</div>
-              <p className="lp-testi-text">"{t.text}"</p>
-              <div className="lp-testi-author">
-                <span className="lp-testi-avatar">{t.avatar}</span>
-                <div>
-                  <div className="lp-testi-name">{t.name}</div>
-                  <div className="lp-testi-role">{t.role}</div>
-                </div>
+      {/* ─── PRICING & B2B PILOT INQUIRY ─── */}
+      <section id="pricing" className="lfb-section lfb-pricing-bg">
+        <div className="lfb-container">
+          <div className="lfb-section-head">
+            <span className="lfb-eyebrow">TRANSPARENT GLOBAL PRICING</span>
+            <h2>Start Free. Scale With Verified Compute.</h2>
+          </div>
+
+          <div className="lfb-pricing-grid">
+            <div className="price-card">
+              <div className="price-tier">Free Sandbox</div>
+              <div className="price-val">$0<span>/mo</span></div>
+              <p className="price-desc">Ideal for designing architectures and testing logic locally.</p>
+              <ul>
+                <li>✓ Full 3-Tier Multi-Cloud Architect</li>
+                <li>✓ Local Python & Lambda Simulator</li>
+                <li>✓ 1 Active Kanban Project Board</li>
+              </ul>
+              <button onClick={handleLaunchSandbox} className="lfb-btn-secondary full-w">
+                Open Free Sandbox
+              </button>
+            </div>
+
+            <div className="price-card price-featured">
+              <div className="price-badge">MOST POPULAR</div>
+              <div className="price-tier">Pro Builder</div>
+              <div className="price-val">$29<span>/mo</span></div>
+              <p className="price-desc">For engineers shipping live multi-cloud AI portfolios.</p>
+              <ul>
+                <li>✓ Live AWS Lambda, Bedrock & Athena Runs</li>
+                <li>✓ Hugging Face & Cross-Cloud Templates</li>
+                <li>✓ Verified SHA-256 Portfolio Certificates</li>
+              </ul>
+              <button onClick={onSignIn} className="lfb-btn-primary-glow full-w">
+                Get Pro Access
+              </button>
+            </div>
+
+            <div className="price-card">
+              <div className="price-tier">B2B Team & Enterprise</div>
+              <div className="price-val">$49<span>/seat/mo</span></div>
+              <p className="price-desc">For IT teams, GCCs, and hiring assessments.</p>
+              <ul>
+                <li>✓ Multi-Tenant Admin & Audit Dashboard</li>
+                <li>✓ Custom Harness Guardrail Policies</li>
+                <li>✓ Candidate Vetting & BYOC Cloud Roles</li>
+              </ul>
+              <a href="#b2b-contact" className="lfb-btn-signin full-w" style={{ textAlign: 'center', display: 'block', textDecoration: 'none' }}>
+                Book B2B Pilot
+              </a>
+            </div>
+          </div>
+
+          {/* Quick B2B Pilot Request Strip */}
+          <div id="b2b-contact" className="lfb-b2b-box">
+            <div>
+              <h3>Request a 14-Day B2B Team Pilot or Custom AI-ERP Sprint</h3>
+              <p>Onboard up to 15 engineers or test a custom multi-cloud workflow with full harness governance.</p>
+            </div>
+            {leadSubmitted ? (
+              <div className="lfb-lead-success">
+                ✓ Request received! Our architecture lead will reach out within 24 hours.
               </div>
-            </div>
-          ))}
+            ) : (
+              <form onSubmit={handleB2bDemoSubmit} className="lfb-b2b-form">
+                <input
+                  type="text"
+                  placeholder="Company / Team Name"
+                  value={b2bCompany}
+                  onChange={(e) => setB2bCompany(e.target.value)}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Work Email (you@company.com)"
+                  value={b2bLeadEmail}
+                  onChange={(e) => setB2bLeadEmail(e.target.value)}
+                  required
+                />
+                <button type="submit" className="lfb-btn-primary-glow">
+                  Request Pilot
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* WHATSAPP BANNER */}
-      <section className="lp-wa-banner">
-        <div className="lp-wa-banner-inner">
-          <div className="lp-wa-banner-text">
-            <h2>Questions? We Reply in Minutes.</h2>
-            <p>Our team is on WhatsApp 24/7 — ask about the job guarantee, curriculum, or payment.</p>
+      {/* ─── FOOTER ─── */}
+      <footer className="lfb-footer">
+        <div className="lfb-container lfb-footer-inner">
+          <div className="lfb-brand">
+            <div className="lfb-logo-icon">L</div>
+            <span className="lfb-brand-text">LearnFromBest</span>
           </div>
-          <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`} target="_blank" rel="noreferrer" className="lp-btn-wa-large">
-            <span>💬</span> Chat on WhatsApp Now
-          </a>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="lp-footer">
-        <div className="lp-footer-inner">
-          <div className="lp-footer-brand">
-            <span>🎓</span> AI Tutoring <span className="lp-logo-accent">Academy</span>
-          </div>
-          <div className="lp-footer-links">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#testimonials">Reviews</a>
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer">Contact</a>
-          </div>
-          <div className="lp-footer-copy">© 2026 AI Tutoring Academy. All rights reserved.</div>
+          <p>© {new Date().getFullYear()} LearnFromBest • Multi-Cloud AI-ERP & Harness Engineering Platform</p>
         </div>
       </footer>
-
-      {/* CHATBOT */}
-      <ChatBot userEmail={userEmail} />
-
     </div>
   );
 }
-
-export default LandingPage;
