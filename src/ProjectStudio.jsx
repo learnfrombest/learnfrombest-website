@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { fetchAuthSession } from 'aws-amplify/auth';
+
+const ADMIN_EMAIL = 'mail.raghav.swaminathan@gmail.com';
 
 const INITIAL_PROJECTS = [
   { id: 'PRJ-IDP', key: 'IDP', name: 'Intelligent Document Processing (IDP)', lead: 'Raghav Swaminathan', desc: 'OCR & Bedrock pipeline for multi-format invoices.' },
@@ -121,6 +124,49 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
   // Comment & Proof Input inside Task Detail
   const [commentText, setCommentText] = useState('');
   const [isOfficialCompletion, setIsOfficialCompletion] = useState(false);
+
+  // Sync Cognito session token for protected static studio pages
+  useEffect(() => {
+    const syncAdminSession = async () => {
+      try {
+        const session = await fetchAuthSession();
+        const idToken = session.tokens?.idToken?.toString() || '';
+        const email = (session.tokens?.idToken?.payload?.email || currentUserEmail || '').toLowerCase();
+
+        if (email === ADMIN_EMAIL && idToken) {
+          localStorage.setItem('lfb_admin_jwt', idToken);
+          localStorage.setItem('lfb_admin_email', email);
+        } else {
+          localStorage.removeItem('lfb_admin_jwt');
+          localStorage.removeItem('lfb_admin_email');
+        }
+      } catch (err) {
+        console.warn('Session sync skipped:', err);
+      }
+    };
+    syncAdminSession();
+  }, [currentUserEmail]);
+
+  const openProtectedStudio = async (studioPath, taskId) => {
+    try {
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString() || '';
+      const email = (session.tokens?.idToken?.payload?.email || currentUserEmail || '').toLowerCase();
+
+      if (email !== ADMIN_EMAIL || !idToken) {
+        alert('Live AWS Studio access is currently restricted to the workspace owner (mail.raghav.swaminathan@gmail.com).');
+        return;
+      }
+
+      localStorage.setItem('lfb_admin_jwt', idToken);
+      localStorage.setItem('lfb_admin_email', email);
+
+      const url = taskId ? `${studioPath}?taskId=${encodeURIComponent(taskId)}` : studioPath;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      alert('Unable to verify Cognito session. Please sign in again.');
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('lfb_projects', JSON.stringify(projects));
@@ -352,22 +398,20 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
           <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '16px 8px 6px' }}>
             Engineering Studios
           </div>
-          <a
-            href="/architecture_builder.html"
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', color: '#38bdf8', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}
+          <button
+            type="button"
+            onClick={() => openProtectedStudio('/architecture_builder.html')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', background: 'transparent', border: 0, color: '#38bdf8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
           >
             <span>❖</span> Solution Architect
-          </a>
-          <a
-            href="/lambda_studio.html"
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', color: '#818cf8', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}
+          </button>
+          <button
+            type="button"
+            onClick={() => openProtectedStudio('/lambda_studio.html')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', background: 'transparent', border: 0, color: '#818cf8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
           >
             <span>🐍</span> Python & Lambda Studio
-          </a>
+          </button>
 
           <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '14px 8px 6px' }}>
             Workspace Actions
@@ -832,22 +876,20 @@ export default function ProjectStudio({ onSignOut, currentUserEmail }) {
                   <span>Attached Proof of Completion ({activeTask.proofs ? activeTask.proofs.length : 0})</span>
                 </h4>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <a
-                    href={`/architecture_builder.html?taskId=${encodeURIComponent(activeTask.id)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ background: '#0e7490', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
+                  <button
+                    type="button"
+                    onClick={() => openProtectedStudio('/architecture_builder.html', activeTask.id)}
+                    style={{ background: '#0e7490', border: 0, color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
                   >
                     ❖ 1. Design Architecture
-                  </a>
-                  <a
-                    href={`/lambda_studio.html?taskId=${encodeURIComponent(activeTask.id)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ background: '#4338ca', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openProtectedStudio('/lambda_studio.html', activeTask.id)}
+                    style={{ background: '#4338ca', border: 0, color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
                   >
                     🐍 2. Open Lambda Studio
-                  </a>
+                  </button>
                   <label style={{ background: '#4f46e5', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                     ＋ Upload Proof File
                     <input type="file" multiple onChange={handleProofUpload} style={{ display: 'none' }} />

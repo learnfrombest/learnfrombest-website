@@ -141,7 +141,8 @@
         <input
           id="provisionerUrlInput"
           type="text"
-          placeholder="https://.../prod/provision (Optional - auto-simulates if blank)"
+          value="https://s6olkyxwui.execute-api.us-east-1.amazonaws.com/provision"
+          placeholder="https://.../provision"
           class="bg-transparent font-mono text-[11px] text-slate-200 w-44 sm:w-64 focus:outline-none placeholder:text-slate-600"
         />
       </div>
@@ -255,41 +256,48 @@
       </div>
     </section>
 
-    <!-- RIGHT PANE: TEST EVENT, EXECUTION OUTPUT & LOGS, PROOF PREVIEW -->
+    <!-- RIGHT PANE: TEST EVENT, EXECUTION OUTPUT & LOGS, PROOF PREVIEW, ENV & CORS -->
     <section class="w-full lg:w-[44%] h-1/2 lg:h-full flex flex-col bg-[#0b1120]">
       
       <!-- Right Pane Tabs -->
-      <div class="h-10 bg-slate-900/90 border-b border-slate-800 px-3 flex items-center justify-between shrink-0">
+      <div class="h-10 bg-slate-900/90 border-b border-slate-800 px-3 flex items-center justify-between shrink-0 overflow-x-auto">
         <div class="flex items-center gap-1">
           <button
             id="tab-event"
             onclick="switchRightTab('event')"
-            class="px-3 py-1.5 rounded-md text-xs font-semibold transition bg-indigo-600/20 text-indigo-300 border border-indigo-500/30"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 whitespace-nowrap"
           >
             Test Event JSON
           </button>
           <button
             id="tab-output"
             onclick="switchRightTab('output')"
-            class="px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
           >
-            <span>Execution Output & Logs</span>
+            <span>Execution Output</span>
             <span id="outputBadge" class="hidden w-2 h-2 rounded-full bg-emerald-400"></span>
           </button>
           <button
             id="tab-proof"
             onclick="switchRightTab('proof')"
-            class="px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
           >
             <span>Proof Preview</span>
             <span id="proofReadyPill" class="hidden text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.2 rounded">READY</span>
+          </button>
+          <button
+            id="tab-config"
+            onclick="switchRightTab('config')"
+            class="px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <span>⚙ Env & CORS</span>
           </button>
         </div>
 
         <button
           onclick="formatTestJson()"
           id="btnFormatJson"
-          class="text-[11px] font-mono text-slate-400 hover:text-indigo-300 px-2 py-1 rounded hover:bg-slate-800 transition"
+          class="text-[11px] font-mono text-slate-400 hover:text-indigo-300 px-2 py-1 rounded hover:bg-slate-800 transition shrink-0"
         >
           { } Format JSON
         </button>
@@ -326,6 +334,16 @@
             <div class="text-[10px] font-bold uppercase text-slate-500">Provisioner Action</div>
             <div id="execAction" class="mt-1 text-xs font-mono font-bold text-indigo-400">--</div>
           </div>
+        </div>
+
+        <!-- Function URL Banner (if CORS enabled) -->
+        <div id="functionUrlBanner" class="hidden bg-emerald-950/50 border border-emerald-500/40 rounded-xl p-2.5 flex items-center justify-between gap-2 text-xs">
+          <div class="truncate font-mono text-emerald-300">
+            <span class="text-slate-400">Function URL:</span> <span id="functionUrlText"></span>
+          </div>
+          <button onclick="copyFunctionUrl()" class="px-2 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 text-[11px] font-bold shrink-0">
+            Copy URL
+          </button>
         </div>
 
         <!-- Return Payload Box -->
@@ -405,11 +423,70 @@
         </div>
       </div>
 
+      <!-- TAB 4: ENVIRONMENT VARIABLES & CORS -->
+      <div id="panel-config" class="hidden flex-1 flex-col p-4 overflow-y-auto space-y-4 select-text">
+        <!-- Environment Variables Section -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">Environment Variables (Key / Value)</span>
+            <button type="button" onclick="addEnvRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2.5 py-1 rounded">
+              ＋ Add Variable
+            </button>
+          </div>
+          <div id="envRowsContainer" class="space-y-2">
+            <div class="grid grid-cols-12 gap-2 env-row">
+              <input type="text" placeholder="KEY (e.g. STAGE)" value="STAGE" class="col-span-5 bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-amber-300 env-key" />
+              <input type="text" placeholder="VALUE" value="production" class="col-span-6 bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-emerald-300 env-val" />
+              <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-slate-500 hover:text-rose-400 font-bold">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CORS Configuration Section -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Lambda Function URL & CORS</span>
+            <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+              <input id="enableCorsCheckbox" type="checkbox" checked />
+              <span>Enable Function URL + CORS</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Allow Origins (comma-separated)</label>
+              <input id="corsOriginsInput" type="text" value="https://learnfrombest.com, http://localhost:3000" class="w-full bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Allow Methods</label>
+              <input id="corsMethodsInput" type="text" value="GET, POST" class="w-full bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Allow Headers</label>
+              <input id="corsHeadersInput" type="text" value="Content-Type, Authorization" class="w-full bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Max Age (seconds)</label>
+              <input id="corsMaxAgeInput" type="number" value="3600" class="w-full bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 font-mono text-slate-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
   </main>
 
   <!-- ─── STUDIO LOGIC & TEMPLATES ─── -->
   <script>
+    // Owner-Only Gate: Restrict direct studio access to signed-in workspace owner
+    (function enforceOwnerAccess() {
+      const ADMIN_EMAIL = "mail.raghav.swaminathan@gmail.com";
+      const activeEmail = (localStorage.getItem("lfb_admin_email") || "").toLowerCase();
+      const activeJwt = localStorage.getItem("lfb_admin_jwt") || "";
+      if (activeEmail !== ADMIN_EMAIL || !activeJwt) {
+        window.location.replace("/");
+      }
+    })();
+
     const STARTER_TEMPLATES = {
       bedrock: {
         code: `import json
@@ -480,7 +557,6 @@ def lambda_handler(event, context):
     query_id = exec_resp["QueryExecutionId"]
     print(f"[INFO] QueryExecutionId: {query_id}")
 
-    # Fetch query results
     results = athena.get_query_results(QueryExecutionId=query_id)
     rows = results.get("ResultSet", {}).get("Rows", [])
 
@@ -560,8 +636,6 @@ def lambda_handler(event, context):
 
     let lastExecutionRecord = null;
 
-    // Initialize Editor on Load
-// Initialize Editor on Load
     window.addEventListener("DOMContentLoaded", () => {
       const params = new URLSearchParams(window.location.search);
       const urlTaskId = params.get("taskId");
@@ -570,32 +644,32 @@ def lambda_handler(event, context):
       }
       updateFunctionPreview();
 
-      // Check if Solution Architecture Builder passed tailored code for this task
-      	const currentTaskId = document.getElementById("taskIdInput").value.trim().toUpperCase();
-      	try {
-        	const archRaw = localStorage.getItem("lfb_selected_architecture");
-        	if (archRaw) {
-          	const arch = JSON.parse(archRaw);
-          	if (arch.taskId === currentTaskId && arch.generatedCode) {
-            	const editor = document.getElementById("codeEditor");
-            	editor.value = arch.generatedCode;
-            	document.getElementById("testEventEditor").value = JSON.stringify(
-              	{ taskId: currentTaskId, source: "architecture_builder", prompt: "Execute workflow" },
-              	null,
-              	2
-            	);
+      const currentTaskId = document.getElementById("taskIdInput").value.trim().toUpperCase();
+      try {
+        const archRaw = localStorage.getItem("lfb_selected_architecture");
+        if (archRaw) {
+          const arch = JSON.parse(archRaw);
+          if (arch.taskId === currentTaskId && arch.generatedCode) {
+            const editor = document.getElementById("codeEditor");
+            editor.value = arch.generatedCode;
+            document.getElementById("testEventEditor").value = JSON.stringify(
+              { taskId: currentTaskId, source: "architecture_builder", prompt: "Execute workflow" },
+              null,
+              2
+            );
             handleCodeInput();
             validateJsonInput();
             showToast("Loaded Architecture Code", `Imported generated boto3 handler for ${currentTaskId}.`, "🚀");
-            	return;
-          	}
-        	}
-      		}catch (e) {
-        	console.warn("Could not read architecture handoff:", e);
-      	}
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not read architecture handoff:", e);
+      }
 
-      	loadStarterTemplate("bedrock");
-    	});
+      loadStarterTemplate("bedrock");
+    });
+
     function updateFunctionPreview() {
       const rawId = document.getElementById("taskIdInput").value.trim() || "IDP-102";
       const sanitizedId = rawId.replace(/[^a-zA-Z0-9-_]/g, "");
@@ -616,24 +690,17 @@ def lambda_handler(event, context):
       validateJsonInput();
     }
 
-    // Syntax Highlighter & Line Numbers
     function highlightPython(code) {
       let escaped = code
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 
-      // Comments
       escaped = escaped.replace(/(#.*$)/gm, '<span class="tok-com">$1</span>');
-      // Strings (double and single quotes)
       escaped = escaped.replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, '<span class="tok-str">$1</span>');
-      // Keywords
       escaped = escaped.replace(/\b(import|from|def|return|if|else|elif|for|while|try|except|with|as|in|not|and|or|True|False|None|raise|class)\b/g, '<span class="tok-kw">$1</span>');
-      // Built-ins
       escaped = escaped.replace(/\b(print|len|json|int|str|float|dict|list|open)\b/g, '<span class="tok-bi">$1</span>');
-      // Function definitions
       escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\s*\()/g, '<span class="tok-fn">$1</span>');
-      // Numbers
       escaped = escaped.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-num">$1</span>');
 
       return escaped + (code.endsWith("\n") ? " " : "");
@@ -688,22 +755,51 @@ def lambda_handler(event, context):
     document.getElementById("codeEditor").addEventListener("click", updateCursorPos);
     document.getElementById("codeEditor").addEventListener("keyup", updateCursorPos);
 
-    // Right Pane Tabs
     function switchRightTab(tab) {
-      ["event", "output", "proof"].forEach(t => {
+      ["event", "output", "proof", "config"].forEach(t => {
         const panel = document.getElementById(`panel-${t}`);
         const btn = document.getElementById(`tab-${t}`);
         if (t === tab) {
           panel.classList.remove("hidden");
           panel.classList.add("flex");
-          btn.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5";
+          btn.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 whitespace-nowrap";
         } else {
           panel.classList.add("hidden");
           panel.classList.remove("flex");
-          btn.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5";
+          btn.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap";
         }
       });
       document.getElementById("btnFormatJson").style.display = tab === "event" ? "inline-block" : "none";
+    }
+
+    function addEnvRow() {
+      const row = document.createElement("div");
+      row.className = "grid grid-cols-12 gap-2 env-row";
+      row.innerHTML = `
+        <input type="text" placeholder="KEY" class="col-span-5 bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-amber-300 env-key" />
+        <input type="text" placeholder="VALUE" class="col-span-6 bg-[#070b14] border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-emerald-300 env-val" />
+        <button type="button" onclick="this.parentElement.remove()" class="col-span-1 text-slate-500 hover:text-rose-400 font-bold">✕</button>
+      `;
+      document.getElementById("envRowsContainer").appendChild(row);
+    }
+
+    function collectLambdaConfig() {
+      const envVars = {};
+      document.querySelectorAll(".env-row").forEach(row => {
+        const k = row.querySelector(".env-key")?.value.trim();
+        const v = row.querySelector(".env-val")?.value ?? "";
+        if (k) envVars[k] = v;
+      });
+
+      const corsEnabled = document.getElementById("enableCorsCheckbox")?.checked;
+      const cors = corsEnabled ? {
+        AllowOrigins: document.getElementById("corsOriginsInput").value.split(",").map(s => s.trim()).filter(Boolean),
+        AllowMethods: document.getElementById("corsMethodsInput").value.split(",").map(s => s.trim()).filter(Boolean),
+        AllowHeaders: document.getElementById("corsHeadersInput").value.split(",").map(s => s.trim()).filter(Boolean),
+        MaxAge: Number(document.getElementById("corsMaxAgeInput").value) || 3600
+      } : null;
+
+      return { envVars, cors };
     }
 
     function validateJsonInput() {
@@ -732,7 +828,6 @@ def lambda_handler(event, context):
       }
     }
 
-    // Simple deterministic hash for proof verification card
     function computeQuickHash(str) {
       let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
       for (let i = 0; i < str.length; i++) {
@@ -745,7 +840,6 @@ def lambda_handler(event, context):
       return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, "0");
     }
 
-    // Core Execution Engine (Real Provisioner API + Seamless Browser Fallback)
     async function executeLambda(mode) {
       if (!validateJsonInput()) {
         switchRightTab("event");
@@ -758,8 +852,8 @@ def lambda_handler(event, context):
       const code = document.getElementById("codeEditor").value;
       const testEvent = JSON.parse(document.getElementById("testEventEditor").value);
       const apiUrl = document.getElementById("provisionerUrlInput").value.trim();
+      const { envVars, cors } = collectLambdaConfig();
 
-      // Loading UI state
       const spinner = document.getElementById("deploySpinner");
       const icon = document.getElementById("deployIcon");
       spinner.classList.remove("hidden");
@@ -773,15 +867,19 @@ def lambda_handler(event, context):
 
       try {
         if (mode === "deploy" && apiUrl) {
-          // Real AWS Provisioner API Call
+          const jwtToken = localStorage.getItem("lfb_admin_jwt") || "";
           const response = await fetch(apiUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ taskId, code, testEvent })
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${jwtToken}`
+            },
+            body: JSON.stringify({ taskId, code, testEvent, envVars, cors })
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const errBody = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errBody || response.statusText}`);
           }
 
           const data = await response.json();
@@ -794,13 +892,15 @@ def lambda_handler(event, context):
             statusLabel: `${data.statusCode || 200} OK (Live AWS)`,
             durationMs: elapsed,
             actionLabel: data.action ? `AWS Lambda ${data.action}` : "Deployed & Invoked",
+            functionUrl: data.functionUrl || null,
             payload: data.result || data,
             logs: data.logs || buildCloudWatchLogs(fnName, elapsed, "LIVE AWS EXECUTION", code)
           });
 
+          document.getElementById("dirtyIndicator").textContent = "• Deployed to AWS";
+          document.getElementById("dirtyIndicator").className = "text-[10px] text-emerald-400 font-mono";
           showToast("Live Lambda Deployed", `${fnName} updated and invoked on AWS.`, "🚀");
         } else {
-          // Smooth Realistic Simulation Fallback (when API URL is empty or Local Simulation clicked)
           await new Promise(r => setTimeout(r, mode === "deploy" ? 750 : 320));
           const elapsed = Math.round(performance.now() - startTime);
           const simulatedOutput = generateSmartSimulation(code, testEvent, fnName);
@@ -809,23 +909,19 @@ def lambda_handler(event, context):
             fnName,
             taskId,
             code,
-            statusLabel: apiUrl ? "200 OK (Fallback Sim)" : "200 OK (Sandbox Sim)",
+            statusLabel: "200 OK (Sandbox Sim)",
             durationMs: elapsed,
-            actionLabel: mode === "deploy" ? "Simulated Create/Update" : "Local Dry-Run",
+            actionLabel: "Local Dry-Run",
+            functionUrl: null,
             payload: simulatedOutput,
-            logs: buildCloudWatchLogs(fnName, elapsed, apiUrl ? "API UNREACHABLE - SIMULATED" : "LOCAL SANDBOX MODE", code)
+            logs: buildCloudWatchLogs(fnName, elapsed, "LOCAL SANDBOX MODE", code)
           });
 
           document.getElementById("dirtyIndicator").textContent = "• Synced";
           document.getElementById("dirtyIndicator").className = "text-[10px] text-emerald-400 font-mono";
-          showToast(
-            mode === "deploy" ? "Sandbox Deployment Complete" : "Simulation Complete",
-            `Executed ${fnName} in ${elapsed}ms.`,
-            "⚡"
-          );
+          showToast("Simulation Complete", `Executed ${fnName} in ${elapsed}ms.`, "⚡");
         }
       } catch (err) {
-        // Fallback smoothly if real API fails due to CORS/network
         const elapsed = Math.round(performance.now() - startTime);
         const simulatedOutput = generateSmartSimulation(code, testEvent, fnName);
 
@@ -836,12 +932,13 @@ def lambda_handler(event, context):
           statusLabel: "200 OK (Offline Fallback)",
           durationMs: elapsed,
           actionLabel: "Fallback Simulation",
+          functionUrl: null,
           payload: simulatedOutput,
-          logs: `[WARN] Could not reach Provisioner API (${err.message}). Falling back to local sandbox simulator.\n` +
+          logs: `[WARN] Provisioner API error (${err.message}). Falling back to local sandbox simulator.\n` +
                 buildCloudWatchLogs(fnName, elapsed, "SANDBOX FALLBACK", code)
         });
 
-        showToast("Switched to Sandbox Simulator", "Provisioner endpoint unreachable; simulated output generated.", "ℹ️");
+        showToast("Switched to Sandbox Simulator", err.message, "⚠️");
       } finally {
         spinner.classList.add("hidden");
         icon.classList.remove("hidden");
@@ -906,7 +1003,7 @@ def lambda_handler(event, context):
       ].join("\n");
     }
 
-    function renderExecutionResult({ fnName, taskId, code, statusLabel, durationMs, actionLabel, payload, logs }) {
+    function renderExecutionResult({ fnName, taskId, code, statusLabel, durationMs, actionLabel, functionUrl, payload, logs }) {
       const formattedJson = JSON.stringify(payload, null, 2);
       const timestamp = new Date().toISOString();
       const shaHash = computeQuickHash(fnName + code + formattedJson);
@@ -918,11 +1015,17 @@ def lambda_handler(event, context):
       document.getElementById("execResultPayload").textContent = formattedJson;
       document.getElementById("execCloudWatchLogs").textContent = logs;
 
-      // Show indicator badges
+      const urlBanner = document.getElementById("functionUrlBanner");
+      if (functionUrl) {
+        document.getElementById("functionUrlText").textContent = functionUrl;
+        urlBanner.classList.remove("hidden");
+      } else {
+        urlBanner.classList.add("hidden");
+      }
+
       document.getElementById("outputBadge").classList.remove("hidden");
       document.getElementById("proofReadyPill").classList.remove("hidden");
 
-      // Populate Proof Preview Card
       document.getElementById("proofCardTitle").textContent = fnName;
       document.getElementById("proofTimestamp").textContent = timestamp;
       document.getElementById("proofMetaTask").textContent = taskId;
@@ -941,6 +1044,12 @@ def lambda_handler(event, context):
       };
     }
 
+    function copyFunctionUrl() {
+      const text = document.getElementById("functionUrlText").textContent;
+      navigator.clipboard?.writeText(text);
+      showToast("Copied Function URL", text, "📋");
+    }
+
     function copyOutput() {
       const text = document.getElementById("execResultPayload").textContent;
       const temp = document.createElement("textarea");
@@ -952,7 +1061,6 @@ def lambda_handler(event, context):
       showToast("Copied to Clipboard", "Execution output JSON copied.", "📋");
     }
 
-    // Attach Proof directly into LearnFromBest ProjectStudio localStorage state
     function attachOutputAsProof() {
       if (!lastExecutionRecord) {
         executeLambda("simulate").then(() => attachOutputAsProof());
@@ -961,7 +1069,6 @@ def lambda_handler(event, context):
 
       const { fnName, taskId, timestamp, shaHash, payload } = lastExecutionRecord;
 
-      // Build clean SVG verification certificate
       const svgProof = `<svg xmlns="http://www.w3.org/2000/svg" width="680" height="320" viewBox="0 0 680 320">
         <rect width="680" height="320" rx="14" fill="#090e1a"/>
         <rect x="16" y="16" width="648" height="288" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
@@ -976,7 +1083,6 @@ def lambda_handler(event, context):
 
       const dataUrl = "data:image/svg+xml;utf8," + encodeURIComponent(svgProof);
 
-      // Sync with ProjectStudio localStorage tasks if present
       try {
         const stored = localStorage.getItem("lfb_tasks");
         if (stored) {

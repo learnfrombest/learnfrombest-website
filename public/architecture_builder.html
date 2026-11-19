@@ -333,6 +333,15 @@
 
   <!-- ─── ARCHITECTURE CATALOG & ENGINE ─── -->
   <script>
+    // Owner-Only Gate: Restrict direct studio access to signed-in workspace owner
+    (function enforceOwnerAccess() {
+      const ADMIN_EMAIL = "mail.raghav.swaminathan@gmail.com";
+      const activeEmail = (localStorage.getItem("lfb_admin_email") || "").toLowerCase();
+      const activeJwt = localStorage.getItem("lfb_admin_jwt") || "";
+      if (activeEmail !== ADMIN_EMAIL || !activeJwt) {
+        window.location.replace("/");
+      }
+    })();	
     const ARCHITECTURE_CATALOG = {
       frontend: {
         title: "Frontend & Presentation",
