@@ -689,22 +689,28 @@ def lambda_handler(event, context):
       handleCodeInput();
       validateJsonInput();
     }
-
     function highlightPython(code) {
-      let escaped = code
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+     	 	const tokenRegex = /(#.*$)|("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(import|from|def|return|if|else|elif|for|while|try|except|with|as|in|not|and|or|True|False|None|raise|class)\b|\b(print|len|json|int|str|float|dict|list|open)\b|\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\s*\()|\b(\d+(?:\.\d+)?)\b/gm;
 
-      escaped = escaped.replace(/(#.*$)/gm, '<span class="tok-com">$1</span>');
-      escaped = escaped.replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, '<span class="tok-str">$1</span>');
-      escaped = escaped.replace(/\b(import|from|def|return|if|else|elif|for|while|try|except|with|as|in|not|and|or|True|False|None|raise|class)\b/g, '<span class="tok-kw">$1</span>');
-      escaped = escaped.replace(/\b(print|len|json|int|str|float|dict|list|open)\b/g, '<span class="tok-bi">$1</span>');
-      escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\s*\()/g, '<span class="tok-fn">$1</span>');
-      escaped = escaped.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-num">$1</span>');
+          const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      		let result = "";
+      		let lastIndex = 0;
 
-      return escaped + (code.endsWith("\n") ? " " : "");
-    }
+      		for (const match of code.matchAll(tokenRegex)) {
+        	result += esc(code.slice(lastIndex, match.index));
+        	const [full, com, str, kw, bi, fn, num] = match;
+        	if (com) result += `<span class="tok-com">${esc(full)}</span>`;
+        	else if (str) result += `<span class="tok-str">${esc(full)}</span>`;
+        	else if (kw) result += `<span class="tok-kw">${esc(full)}</span>`;
+        	else if (bi) result += `<span class="tok-bi">${esc(full)}</span>`;
+        	else if (fn) result += `<span class="tok-fn">${esc(full)}</span>`;
+        	else if (num) result += `<span class="tok-num">${esc(full)}</span>`;
+        	lastIndex = match.index + full.length;
+      		}
+
+         	result += esc(code.slice(lastIndex));
+         	return result + (code.endsWith("\n") ? " " : "");
+      }
 
     function handleCodeInput() {
       const editor = document.getElementById("codeEditor");
