@@ -21,7 +21,7 @@ import EnterpriseDashboard from './EnterpriseDashboard';
 
 // Amplify Imports
 import { Amplify } from 'aws-amplify';
-import { signOut } from 'aws-amplify/auth';
+import { signOut, fetchAuthSession } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/api';
 
 import outputs from './amplify_outputs.json';
@@ -48,9 +48,33 @@ function App() {
 
   const userEmail = user?.signInDetails?.loginId;
 
+  async function syncAdminSession(emailOverride) {
+    try {
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString() || '';
+      const resolvedEmail = (
+        session.tokens?.idToken?.payload?.email ||
+        emailOverride ||
+        ''
+      ).toLowerCase();
+
+      if (resolvedEmail === adminEmail && idToken) {
+        localStorage.setItem('lfb_admin_jwt', idToken);
+        localStorage.setItem('lfb_admin_email', resolvedEmail);
+      } else {
+        localStorage.removeItem('lfb_admin_jwt');
+        localStorage.removeItem('lfb_admin_email');
+      }
+    } catch (err) {
+      console.error('Failed to sync Cognito session:', err);
+    }
+  }
+
   async function handleSignOut() {
     try {
       await signOut();
+      localStorage.removeItem('lfb_admin_jwt');
+      localStorage.removeItem('lfb_admin_email');
       setUser(null);
       setCurrentPage('landing');
       navigate('/');
@@ -111,6 +135,7 @@ function App() {
 
   useEffect(() => {
     if (userEmail) {
+      syncAdminSession(userEmail);
       saveUserToDB(userEmail);
       if (userEmail === adminEmail) {
         fetchAllUsers();
@@ -133,12 +158,12 @@ function App() {
       {currentPage === 'auth' ? (
         <AuthPage
           onBack={() => setCurrentPage('landing')}
-          onSignIn={(u, phone) => {
+          onSignIn={async (u, phone) => {
+            const email = u?.signInDetails?.loginId;
+            await syncAdminSession(email);
             setUser(u);
             setCurrentPage('landing');
-            const email = u?.signInDetails?.loginId;
             notifySupervisor(email, phone);
-            // Route directly to role selector / workspace
             navigate('/');
           }}
         />
