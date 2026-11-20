@@ -1,157 +1,356 @@
-.enterprise-dashboard{
-
-  min-height:100vh;
-
-  background:
-    linear-gradient(
-      135deg,
-      #0f172a,
-      #1e1b4b,
-      #4f46e5
-    );
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  position:relative;
-
-  overflow:hidden;
-
-  font-family:Arial,sans-serif;
+.enterprise-dashboard {
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.1), transparent 42%), #070b14;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.overlay{
-
-  position:absolute;
-
-  inset:0;
-
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(255,255,255,0.08),
-      transparent 40%
-    );
+.ed-header {
+  border-bottom: 1px solid #1e293b;
+  background: #0b1120;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.dashboard-content{
-
-  position:relative;
-
-  z-index:2;
-
-  width:90%;
-
-  max-width:1400px;
+.ed-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.hero-section{
-
-  text-align:center;
-
-  margin-bottom:70px;
-
-  color:white;
+.ed-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #fff;
 }
 
-.hero-section h1{
-
-  font-size:72px;
-
-  margin-bottom:20px;
-
-  font-weight:800;
+.ed-brand-title {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.3px;
 }
 
-.hero-section p{
-
-  font-size:24px;
-
-  opacity:0.8;
+.ed-owner-badge {
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
-.card-grid{
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(auto-fit,minmax(280px,1fr));
-
-  gap:35px;
+.ed-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
 }
 
-.industry-card{
-
-  background:
-    rgba(255,255,255,0.08);
-
-  border:
-    1px solid rgba(255,255,255,0.12);
-
-  border-radius:30px;
-
-  padding:50px 35px;
-
-  backdrop-filter:blur(20px);
-
-  color:white;
-
-  cursor:pointer;
-
-  transition:0.35s;
-
-  box-shadow:
-    0 15px 40px rgba(0,0,0,0.25);
+.ed-user-email {
+  color: #94a3b8;
 }
 
-.industry-card:hover{
-
-  transform:
-    translateY(-10px)
-    scale(1.02);
-
-  background:
-    rgba(255,255,255,0.12);
-
-  box-shadow:
-    0 25px 60px rgba(79,70,229,0.35);
+.ed-btn-secondary {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: background 0.15s ease;
 }
 
-.card-icon{
-
-  font-size:60px;
-
-  margin-bottom:25px;
+.ed-btn-secondary:hover {
+  background: #334155;
 }
 
-.industry-card h2{
-
-  font-size:34px;
-
-  margin-bottom:18px;
+.ed-btn-signout {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
 }
 
-.industry-card p{
-
-  opacity:0.8;
-
-  line-height:1.7;
-
-  font-size:18px;
+.ed-main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 44px 24px;
 }
 
-@media(max-width:768px){
+.ed-hero {
+  margin-bottom: 28px;
+}
 
-  .hero-section h1{
+.ed-hero h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
 
-    font-size:46px;
+.ed-hero p {
+  margin: 6px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.ed-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.ed-stat-card {
+  background: #0f172a;
+  border-radius: 14px;
+  padding: 22px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ed-stat-card.done {
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.ed-stat-card.progress {
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.ed-stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ed-stat-card.done .ed-stat-label {
+  color: #34d399;
+}
+
+.ed-stat-card.progress .ed-stat-label {
+  color: #38bdf8;
+}
+
+.ed-stat-count {
+  font-size: 44px;
+  font-weight: 900;
+  margin: 8px 0 6px;
+  color: #fff;
+  line-height: 1;
+}
+
+.ed-stat-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.ed-create-card {
+  background: linear-gradient(145deg, rgba(79, 70, 229, 0.22), rgba(15, 23, 42, 0.95));
+  border: 1px dashed #6366f1;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.ed-create-card:hover {
+  transform: translateY(-2px);
+  border-color: #818cf8;
+  background: linear-gradient(145deg, rgba(79, 70, 229, 0.32), rgba(15, 23, 42, 0.98));
+}
+
+.ed-create-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #a5b4fc;
+}
+
+.ed-create-title {
+  font-size: 21px;
+  font-weight: 800;
+  margin: 12px 0 6px;
+}
+
+.ed-create-sub {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.ed-nav-panel {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ed-btn-jira {
+  width: 100%;
+  background: linear-gradient(90deg, #4f46e5, #2563eb);
+  border: 0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.ed-btn-jira:hover {
+  opacity: 0.94;
+  transform: translateY(-1px);
+}
+
+.ed-tools-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.ed-btn-tool {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ed-btn-tool:hover {
+  background: #263349;
+  border-color: #475569;
+}
+
+.ed-btn-tool.arch {
+  color: #38bdf8;
+}
+
+.ed-btn-tool.lambda {
+  color: #a5b4fc;
+}
+
+.ed-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.ed-modal {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+}
+
+.ed-modal h3 {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.ed-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ed-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ed-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+}
+
+.ed-input:focus {
+  border-color: #6366f1;
+}
+
+.ed-input.mono {
+  font-family: monospace;
+}
+
+.ed-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ed-btn-primary {
+  background: #4f46e5;
+  border: 0;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .ed-hero h1 {
+    font-size: 22px;
   }
-
-  .hero-section p{
-
-    font-size:18px;
+  .ed-stat-count {
+    font-size: 36px;
   }
 }
