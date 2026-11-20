@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import './EnterpriseDashboard.css';
@@ -114,6 +114,13 @@ const KOCHI_METRO_STORIES = [
 
 export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
   const navigate = useNavigate();
+  const videoRef = useRef(null);
+
+  const isOwnerUser = (userEmail || '').toLowerCase() === ADMIN_EMAIL || isAdmin;
+
+  // Story Intro Sequence States: 'video' -> 'picture' -> 'dashboard'
+  const [introStage, setIntroStage] = useState(() => (isOwnerUser ? 'video' : 'dashboard'));
+  const [pictureCountdown, setPictureCountdown] = useState(4);
 
   const [projects, setProjects] = useState(() => {
     try {
@@ -162,9 +169,44 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
     syncToken();
   }, [userEmail]);
 
+  // Ensure video auto-plays cleanly when entering 'video' stage
+  useEffect(() => {
+    if (introStage === 'video' && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser blocks unmuted autoplay, mute and play immediately
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => setIntroStage('picture'));
+          }
+        });
+      }
+    }
+  }, [introStage]);
+
+  // Auto-advance from 'picture' stage to 'dashboard' after 4 seconds
+  useEffect(() => {
+    if (introStage !== 'picture') return;
+    setPictureCountdown(4);
+
+    const interval = setInterval(() => {
+      setPictureCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIntroStage('dashboard');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [introStage]);
+
   const currentStory = KOCHI_METRO_STORIES[activeStoryIndex];
 
-  // Calculate total annual INR Lakhs saved across accepted projects
   const totalLakhsSaved = projects.reduce(
     (sum, p) => sum + (Number(p.savingsLakhs) || 10),
     0
@@ -229,7 +271,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
       proofs: []
     }));
 
-    // Avoid duplicating starter tasks if already accepted
     const existingTaskIds = new Set(tasks.map((t) => t.id));
     const filteredNewTasks = newTasksToAdd.filter((t) => !existingTaskIds.has(t.id));
     const updatedTasks = [...filteredNewTasks, ...tasks];
@@ -303,6 +344,88 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
     }
   };
 
+  // ─── STAGE 1: AUTO-PLAY KOCHI METRO INTRO VIDEO ───
+  if (introStage === 'video') {
+    return (
+      <div className="ed-intro-overlay">
+        <div className="ed-intro-topbar">
+          <span className="ed-intro-badge">🚇 KOCHI METRO EXPEDITION • ARRIVING AT KALOOR...</span>
+          <button
+            type="button"
+            className="ed-intro-skip"
+            onClick={() => setIntroStage('picture')}
+          >
+            Next Scene →
+          </button>
+        </div>
+
+        <video
+          ref={videoRef}
+          className="ed-intro-video"
+          src="/media/kochi_metro_intro.mp4"
+          autoPlay
+          muted
+          playsInline
+          onEnded={() => setIntroStage('picture')}
+          onError={() => setIntroStage('picture')}
+        />
+
+        <div className="ed-intro-footer">
+          <span>Raghav (Kochi’s AI Architect) heading to meet local business owners...</span>
+          <button
+            type="button"
+            className="ed-intro-skip-all"
+            onClick={() => setIntroStage('dashboard')}
+          >
+            Skip to Dashboard ⏭
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── STAGE 2: AUTO-LOAD STORY PICTURE SCENE ───
+  if (introStage === 'picture') {
+    return (
+      <div className="ed-intro-overlay picture-stage">
+        <div className="ed-intro-topbar">
+          <span className="ed-intro-badge">📍 KALOOR STATION • DISCOVERY MAP LOADED</span>
+          <span className="ed-intro-timer">Entering Command Center in {pictureCountdown}s...</span>
+        </div>
+
+        <div className="ed-picture-frame">
+          <img
+            src="/media/kochi_metro_scene.jpg"
+            alt="Kochi Metro Discovery Map and Raghav in Kochi Metro"
+            className="ed-intro-image"
+            onError={() => setIntroStage('dashboard')}
+          />
+        </div>
+
+        <div className="ed-intro-footer">
+          <button
+            type="button"
+            className="ed-btn-accept"
+            onClick={() => {
+              acceptStoryRequirement(KOCHI_METRO_STORIES[0], false);
+              setIntroStage('dashboard');
+            }}
+          >
+            🤝 Join Mission &amp; Capture ₹10L/yr IDP Requirement
+          </button>
+          <button
+            type="button"
+            className="ed-btn-accept-go"
+            onClick={() => setIntroStage('dashboard')}
+          >
+            Continue to Client Discovery Dashboard →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── STAGE 3: MAIN CLIENT DISCOVERY DASHBOARD ───
   return (
     <div className="enterprise-dashboard">
       {/* Top Navbar */}
@@ -315,6 +438,14 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
         </div>
 
         <div className="ed-header-actions">
+          <button
+            type="button"
+            className="ed-btn-secondary"
+            onClick={() => setIntroStage('video')}
+            title="Replay Kochi Metro intro video & story card"
+          >
+            ▶ Replay Intro
+          </button>
           {userEmail && <span className="ed-user-email">{userEmail}</span>}
           <button
             type="button"
