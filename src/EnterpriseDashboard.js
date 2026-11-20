@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import './EnterpriseDashboard.css';
+import kochiMetroVideo from './assets/kochi_metro_intro.mp4';
+import kochiMetroScene from './assets/kochi_metro_scene.jpg';
 
 const ADMIN_EMAIL = 'mail.raghav.swaminathan@gmail.com';
 
@@ -120,7 +122,7 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
 
   // Story Intro Sequence States: 'video' -> 'picture' -> 'dashboard'
   const [introStage, setIntroStage] = useState(() => (isOwnerUser ? 'video' : 'dashboard'));
-  const [pictureCountdown, setPictureCountdown] = useState(4);
+  const [pictureCountdown, setPictureCountdown] = useState(5);
 
   const [projects, setProjects] = useState(() => {
     try {
@@ -144,7 +146,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
   const [storyFeedback, setStoryFeedback] = useState('');
   const [showCustomModal, setShowCustomModal] = useState(false);
 
-  // Custom Kochi Story / Client Requirement Form
   const [customStation, setCustomStation] = useState('Vyttila Mobility Hub');
   const [customBusiness, setCustomBusiness] = useState('');
   const [customProjectName, setCustomProjectName] = useState('');
@@ -169,27 +170,23 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
     syncToken();
   }, [userEmail]);
 
-  // Ensure video auto-plays cleanly when entering 'video' stage
   useEffect(() => {
     if (introStage === 'video' && videoRef.current) {
+      videoRef.current.muted = true;
       videoRef.current.currentTime = 0;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // If browser blocks unmuted autoplay, mute and play immediately
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.play().catch(() => setIntroStage('picture'));
-          }
+        playPromise.catch((err) => {
+          console.warn('Video autoplay blocked:', err);
+          setIntroStage('picture');
         });
       }
     }
   }, [introStage]);
 
-  // Auto-advance from 'picture' stage to 'dashboard' after 4 seconds
   useEffect(() => {
     if (introStage !== 'picture') return;
-    setPictureCountdown(4);
+    setPictureCountdown(5);
 
     const interval = setInterval(() => {
       setPictureCountdown((prev) => {
@@ -362,7 +359,7 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
         <video
           ref={videoRef}
           className="ed-intro-video"
-          src="/media/kochi_metro_intro.mp4"
+          src={kochiMetroVideo}
           autoPlay
           muted
           playsInline
@@ -395,7 +392,7 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
 
         <div className="ed-picture-frame">
           <img
-            src="/media/kochi_metro_scene.jpg"
+            src={kochiMetroScene}
             alt="Kochi Metro Discovery Map and Raghav in Kochi Metro"
             className="ed-intro-image"
             onError={() => setIntroStage('dashboard')}
@@ -428,7 +425,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
   // ─── STAGE 3: MAIN CLIENT DISCOVERY DASHBOARD ───
   return (
     <div className="enterprise-dashboard">
-      {/* Top Navbar */}
       <header className="ed-header">
         <div className="ed-brand">
           <div className="ed-logo">L</div>
@@ -466,9 +462,7 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
         </div>
       </header>
 
-      {/* Main Story-Driven Command Center */}
       <main className="ed-main">
-        {/* Compact Impact & Progress Strip */}
         <div className="ed-impact-strip">
           <div className="ed-impact-item">
             <span className="ed-impact-label">CLIENT VALUE PIPELINE</span>
@@ -491,7 +485,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
           </button>
         </div>
 
-        {/* Kochi Metro Line Station Selector */}
         <div className="ed-metro-bar">
           <div className="ed-metro-header">
             <span className="ed-metro-badge">🚇 KOCHI METRO LINE • CLIENT DISCOVERY JOURNEY</span>
@@ -519,7 +512,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
           </div>
         </div>
 
-        {/* Active Story Encounter Card */}
         <section className="ed-story-card">
           <div className="ed-story-top">
             <div>
@@ -535,7 +527,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
             </div>
           </div>
 
-          {/* Client Dialogue Bubble */}
           <div className="ed-dialogue-box">
             <div className="ed-avatar-client">🧑‍💼</div>
             <div className="ed-dialogue-content">
@@ -546,7 +537,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
             </div>
           </div>
 
-          {/* Architect Action Bar */}
           <div className="ed-story-actions">
             <button
               type="button"
@@ -583,7 +573,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
           )}
         </section>
 
-        {/* Bottom Studio Launchers */}
         <div className="ed-nav-panel">
           <button
             type="button"
@@ -616,7 +605,6 @@ export default function EnterpriseDashboard({ onSignOut, userEmail, isAdmin }) {
         </div>
       </main>
 
-      {/* Custom Client Requirement Modal */}
       {showCustomModal && (
         <div className="ed-modal-backdrop">
           <div className="ed-modal">
