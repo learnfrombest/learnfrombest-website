@@ -1,6 +1,8 @@
 .enterprise-dashboard {
   min-height: 100vh;
-  background: radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.1), transparent 42%), #070b14;
+  background: radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.1), transparent 40%),
+              radial-gradient(circle at 82% 20%, rgba(56, 189, 248, 0.1), transparent 42%),
+              #060a14;
   color: #f8fafc;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
@@ -26,7 +28,7 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  background: linear-gradient(135deg, #4f46e5, #10b981);
   display: grid;
   place-items: center;
   font-weight: 900;
@@ -36,7 +38,17 @@
 .ed-brand-title {
   font-weight: 800;
   font-size: 16px;
-  letter-spacing: -0.3px;
+}
+
+.ed-channel-pill {
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
 }
 
 .ed-owner-badge {
@@ -70,11 +82,6 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 12px;
-  transition: background 0.15s ease;
-}
-
-.ed-btn-secondary:hover {
-  background: #334155;
 }
 
 .ed-btn-signout {
@@ -89,126 +96,320 @@
 }
 
 .ed-main {
-  max-width: 1040px;
+  max-width: 1060px;
   margin: 0 auto;
-  padding: 44px 24px;
+  padding: 28px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.ed-hero {
-  margin-bottom: 28px;
-}
-
-.ed-hero h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
-}
-
-.ed-hero p {
-  margin: 6px 0 0;
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.ed-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.ed-stat-card {
+/* Top Impact Strip */
+.ed-impact-strip {
   background: #0f172a;
+  border: 1px solid #1e293b;
   border-radius: 14px;
-  padding: 22px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.ed-stat-card.done {
-  border: 1px solid rgba(16, 185, 129, 0.35);
+.ed-impact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.ed-stat-card.progress {
-  border: 1px solid rgba(56, 189, 248, 0.35);
-}
-
-.ed-stat-label {
-  font-size: 11px;
+.ed-impact-label {
+  font-size: 10px;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
+  color: #64748b;
 }
 
-.ed-stat-card.done .ed-stat-label {
+.ed-impact-value {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.ed-impact-value.green {
   color: #34d399;
 }
 
-.ed-stat-card.progress .ed-stat-label {
+.ed-impact-value.cyan {
   color: #38bdf8;
 }
 
-.ed-stat-count {
-  font-size: 44px;
-  font-weight: 900;
-  margin: 8px 0 6px;
-  color: #fff;
-  line-height: 1;
+.ed-impact-value.amber {
+  color: #fbbf24;
 }
 
-.ed-stat-sub {
+.ed-btn-custom-story {
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid #6366f1;
+  color: #c7d2fe;
+  padding: 9px 14px;
+  border-radius: 10px;
   font-size: 12px;
-  color: #94a3b8;
-  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.ed-create-card {
-  background: linear-gradient(145deg, rgba(79, 70, 229, 0.22), rgba(15, 23, 42, 0.95));
-  border: 1px dashed #6366f1;
-  border-radius: 14px;
-  padding: 22px;
+.ed-btn-custom-story:hover {
+  background: rgba(99, 102, 241, 0.3);
+}
+
+/* Kochi Metro Track */
+.ed-metro-bar {
+  background: #0b1222;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.ed-metro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ed-metro-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+}
+
+.ed-metro-hint {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.ed-stations-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.ed-station-btn {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   text-align: left;
   cursor: pointer;
+  color: #cbd5e1;
+  transition: all 0.15s ease;
+}
+
+.ed-station-btn:hover {
+  border-color: #38bdf8;
+}
+
+.ed-station-btn.active {
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.35), rgba(15, 23, 42, 0.95));
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.15);
+}
+
+.ed-station-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #475569;
+  flex-shrink: 0;
+}
+
+.ed-station-btn.active .ed-station-dot {
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+}
+
+.ed-station-meta {
   display: flex;
   flex-direction: column;
+}
+
+.ed-station-stop {
+  font-size: 10px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.ed-station-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Client Story Card */
+.ed-story-card {
+  background: linear-gradient(160deg, #0f172a 0%, #0b1326 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+}
+
+.ed-story-top {
+  display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ed-story-location {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.ed-story-location strong {
+  color: #e2e8f0;
+}
+
+.ed-story-project-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
   color: #fff;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
-.ed-create-card:hover {
-  transform: translateY(-2px);
-  border-color: #818cf8;
-  background: linear-gradient(145deg, rgba(79, 70, 229, 0.32), rgba(15, 23, 42, 0.98));
+.ed-story-project-title span {
+  color: #34d399;
 }
 
-.ed-create-tag {
+.ed-roi-badge {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #34d399;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: monospace;
+}
+
+.ed-dialogue-box {
+  background: #070c18;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #fbbf24;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.ed-avatar-client {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #1e293b;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.ed-speaker-name {
   font-size: 11px;
   font-weight: 700;
+  color: #fbbf24;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #a5b4fc;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
 }
 
-.ed-create-title {
-  font-size: 21px;
+.ed-dialogue-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #f1f5f9;
+  font-style: italic;
+}
+
+.ed-story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.ed-btn-accept {
+  background: #10b981;
+  border: 0;
+  color: #042f2e;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 800;
-  margin: 12px 0 6px;
+  cursor: pointer;
 }
 
-.ed-create-sub {
-  font-size: 12px;
+.ed-btn-accept:hover {
+  background: #34d399;
+}
+
+.ed-btn-accept-go {
+  background: #4f46e5;
+  border: 0;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ed-btn-accept-go:hover {
+  background: #6366f1;
+}
+
+.ed-btn-next-stop {
+  margin-left: auto;
+  background: #1e293b;
+  border: 1px solid #334155;
   color: #cbd5e1;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
+.ed-feedback-banner {
+  margin-top: 14px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Bottom Studio Launchers */
 .ed-nav-panel {
   background: #0f172a;
   border: 1px solid #1e293b;
   border-radius: 16px;
-  padding: 22px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .ed-btn-jira {
@@ -216,7 +417,7 @@
   background: linear-gradient(90deg, #4f46e5, #2563eb);
   border: 0;
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 15px 20px;
   color: #fff;
   font-size: 15px;
   font-weight: 800;
@@ -224,13 +425,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.ed-btn-jira:hover {
-  opacity: 0.94;
-  transform: translateY(-1px);
 }
 
 .ed-tools-row {
@@ -251,12 +445,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.ed-btn-tool:hover {
-  background: #263349;
-  border-color: #475569;
 }
 
 .ed-btn-tool.arch {
@@ -267,10 +455,11 @@
   color: #a5b4fc;
 }
 
+/* Modal */
 .ed-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -284,7 +473,7 @@
   border: 1px solid #334155;
   border-radius: 16px;
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
   padding: 24px;
 }
 
@@ -298,6 +487,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.ed-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .ed-label {
@@ -318,10 +513,7 @@
   color: #fff;
   font-size: 13px;
   outline: none;
-}
-
-.ed-input:focus {
-  border-color: #6366f1;
+  font-family: inherit;
 }
 
 .ed-input.mono {
@@ -344,13 +536,4 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
-}
-
-@media (max-width: 640px) {
-  .ed-hero h1 {
-    font-size: 22px;
-  }
-  .ed-stat-count {
-    font-size: 36px;
-  }
 }
